@@ -1,5 +1,0 @@
-
-    # This is a tensor mapping file for GGUF conversion
-    # Original tensor name -> GGUF tensor name
-    lm_head.weight = output.weight
-    
