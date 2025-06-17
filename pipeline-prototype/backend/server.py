@@ -1,8 +1,22 @@
 from flask import Flask, request, jsonify 
 from flask_cors import CORS
+import time as t
+
+# Used for the Gemma 3 (Fine-Tuned) model
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+import transformers
+import gc
+from huggingface_hub import login
+from transformers import pipeline
+
+from dotenv import load_dotenv
+
+load_dotenv() # Loading Huggingface token
 
 from pathlib import Path
 import sys
+import os
 
 app = Flask(__name__)
 CORS(app) # enable CORS to allow request from native react app
@@ -21,6 +35,53 @@ from classifier import Classifier
 
 # Initialize the classifier
 classifier = Classifier()
+
+
+# Use CUDA for the model
+device = "cuda:0" if torch.cuda.is_available() else "cpu"
+
+# Loading the model
+model_name = "timely/TimelyAI"
+secret_token = os.getenv("SECRET_KEY")
+
+# Login
+login(token=secret_token)
+
+try:
+    # Load tokenizer first
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_name,
+        trust_remote_code=True
+    )
+    print("Tokenizer loaded successfully")
+    
+    # Load model with multi-GPU support
+    model = AutoModelForCausalLM.from_pretrained(
+        model_name
+    )
+    print("Model loaded successfully!")
+
+except Exception as e:
+    print(f"Error loading model: {e}")
+    print("Trying without quantization...")
+    
+    # Fallback: Load without quantization
+    try:
+        model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            device_map="auto",
+            torch_dtype=torch.float16,
+            trust_remote_code=True,
+            low_cpu_mem_usage=True
+        )
+        print("Model loaded without quantization")
+    except Exception as e2:
+        print(f"Failed to load model: {e2}")
+        model = None
+
+# Setting up pipeline
+pipe = pipeline("text-generation", model="timely/TimelyAI", device_map="balanced", torch_dtype=torch.bfloat16)
+
 
 @app.route('/prompt', methods=['POST'])
 def verify():
@@ -48,7 +109,21 @@ def verify():
     else:
         return jsonify({"Error": "Invalid Prompt"}), 400
 
-
+def prompt_model(messages):
+    """ 
+        Prompt the model and get a request back
+        outputted into the terminal.
+    """
+    start_time = t.perf_counter()
+    print(f'Start time: {t.perf_counter() - start_time} seconds')
+    
+    output = pipe(text_inputs=messages, max_new_tokens=1000)
+    print(output[0]["generated_text"][-1]["content"])
+    
+    end_time = t.perf_counter() - start_time
+    print(end_time)
+    
+    print('Ending time: {:2.2} seconds'.format(end_time))
 
 # Run the backend
 if __name__ == "__main__":
