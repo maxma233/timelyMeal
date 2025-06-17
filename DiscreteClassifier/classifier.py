@@ -2,12 +2,17 @@ import pandas as pd
 import numpy as np
 from collections import Counter as ctr
 
+from pathlib import Path
 import os
 # import subprocess
 
 # Verifying and moving to correct location
-os.chdir(os.getcwd() + '\\DiscreteClassifier')
-print(f'Current Working Directory: {os.getcwd()}')
+
+current_dir = Path(__file__).resolve().parent
+file_name_to_data = current_dir / 'timelymealsdiscreteannotated.csv'
+
+# os.chdir(os.getcwd() + '\\DiscreteClassifier')
+# print(f'Current Working Directory: {os.getcwd()}')
 # subprocess.run("dir", shell=True)
 
 def read_file() -> pd.DataFrame:
@@ -17,7 +22,7 @@ def read_file() -> pd.DataFrame:
         by tokenizing the input. 
         Returns: Pandas Dataframe containing the data
     """
-    data = pd.read_csv('timelymealsdiscreteannotated.csv', skiprows=1, names=['type','text', 'c3', 'c4', 'c5'], delimiter=',', encoding='ISO-8859-1')
+    data = pd.read_csv(str(file_name_to_data), skiprows=1, names=['type','text', 'c3', 'c4', 'c5'], delimiter=',', encoding='ISO-8859-1')
 
     # Tokenizing the input
     data['clean'] = data.text.apply(lambda x: x.lower().split())
