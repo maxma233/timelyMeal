@@ -28,21 +28,28 @@ def verify():
     # Grab JSON of the request
     data = request.get_json()
 
-    if (data.method != 'POST'):
+    if (request.method != 'POST'):
         return jsonify({"Error": "Invalid method request type"}), 400
 
     # Should contain an attribute named 'prompt'
-    prompt = data.prompt or ''
+    prompt = data['prompt'] or ''
     
     if not prompt:
         return jsonify({"Error": "No prompt was sent to the backend"}), 400
-
-    # Validate the prompt
-    # result = classifier.verify(prompt=prompt)
     
-    return jsonify({"Message": "Valid Prompt"}), 201 if result == 1 else jsonify({"Error": "Invalid Prompt"}), 400
+    # Validate the prompt
+    result = classifier.verify(prompt=prompt)
+
+    # print(prompt)
+    # print(result)
+
+    if result == 1:
+        return jsonify({"Message": "Valid Prompt"}), 201
+    else:
+        return jsonify({"Error": "Invalid Prompt"}), 400
+
 
 
 # Run the backend
 if __name__ == "__main__":
-    app.run(debug=True, host="127.0.0.1", port=8081)
+    app.run(debug=True, host="0.0.0.0", port=5000)

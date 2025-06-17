@@ -10,10 +10,41 @@ import AssetExample from './components/AssetExample';
 
 export default function App() {
   const [text, setText] = useState('');
-  const handleSearch = () => {
-    console.log("Search text:", text);
+  const handleSearch = async () => {
+
+    if (!text.trim()) {
+      console.log("Empty search text");
+      return;
+    }
+
+    // const form = new FormData();
+    // form.append("prompt", text);
+
+    const response = await fetch('http://127.0.0.1:5000/prompt',
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ prompt: text }),
+      });
+
+
+    console.log(response);
+
+    if (!response.ok) {
+      throw new Error(`Server Error: ${response.status}`);
+    } else {
+      console.log("Valid prompt!")
+    }
+
+    const data = await response.json();
+
+    console.log(data);
 
   }
+
+
 
   return (
     <SafeAreaView style={styles.body}>
