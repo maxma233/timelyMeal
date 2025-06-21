@@ -12,7 +12,7 @@ export default function App() {
   const [text, setText] = useState('');
   const handleSearch = async () => {
 
-    if (!text.trim()) {
+    if (text.length === 0 || !text.trim()) {
       console.log("Empty search text");
       return;
     }
@@ -32,19 +32,74 @@ export default function App() {
 
     console.log(response);
 
+    // ON BAD CASE: Update UI
     if (!response.ok) {
-      throw new Error(`Server Error: ${response.status}`);
-    } else {
-      console.log("Valid prompt!")
+      console.log("Invalid prompt!");
+      return;
+      // throw new Error(`Server Error: ${response.status}`);
     }
 
+    // Update UI to state valid case
     const data = await response.json();
+    console.log("Valid prompt!");
 
-    console.log(data);
+    // Send request to the backend to prompt model
+
+    // let output = undefined;
+
+    // const modelRequest = await fetch('http://127.0.0.1:5000/model',
+    //   {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json"
+    //     },
+    //     body: JSON.stringify({ prompt: text })
+    //   }
+    // ).then(async () => {
+    //   output = await modelRequest.json()
+    // }).catch(
+    //   // Return an error instead
+    //   console.error("Request to model API failed!")
+    // );
+
+    // // Something went wrong when trying to grab the model's output
+    // if (!output) {
+    //   throw new Error("Model output failed to instantiate!");
+    // }
+
+    // Update UI from the model output
+
+    // console.log(data.message);
 
   }
 
+  const handleNewPrompt = async (type) => {
 
+    let output = undefined;
+
+    const response = await fetch("http://127.0.0.1:5000/add",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: { category: type, prompt: text } })
+      }
+    ).then(
+      async (value) => { output = await value.json() }
+    ).catch(
+      (reason) => {
+        // Return an error instead
+        console.error(`Error: ${reason}`);
+      }
+    );
+
+    if (!output) {
+      throw new Error("Model output failed to instantiate!");
+    }
+
+    console.log("Successful appending to dataset!");
+  }
 
   return (
     <SafeAreaView style={styles.body}>
@@ -88,6 +143,22 @@ export default function App() {
             <Icon name="arrow-right" type="entypo" size={24} color="white" />
           </button>
 
+        </div>
+
+        <div
+          style={{ display: 'flex' }}>
+          <button
+            style={{ ...styles.searchButton, ...styles.promptButton }}
+            onClick={() => {
+              handleNewPrompt("Valid")
+            }}
+          >False Negative</button>
+          <button
+            style={{ ...styles.searchButton, ...styles.promptButton }}
+            onClick={() => {
+              handleNewPrompt("Invalid")
+            }}
+          >False Positive</button>
         </div>
 
         <Text style={{ color: '#FF0000' }}>
@@ -164,4 +235,7 @@ const styles = StyleSheet.create({
     borderColor: '#000',
     borderWidth: '2px',
   },
+  promptButton: {
+    width: 80,
+  }
 });
