@@ -24,6 +24,7 @@ CORS(app) # enable CORS to allow request from native react app
 current_dir = Path(__file__).resolve().parent
 # Add the path correctly
 script_dir = current_dir.parent.parent / 'DiscreteClassifier'
+DEFAULT_FILE_LOCATION = script_dir / 'timelymealsdiscreteannotated.csv'
 
 if script_dir.exists():
     sys.path.append(str(script_dir))
@@ -34,7 +35,7 @@ else:
 from classifier import Classifier
 
 # Initialize the classifier
-classifier = Classifier()
+classifier = Classifier(file_location=DEFAULT_FILE_LOCATION)
 
 
 # Use CUDA for the model
@@ -80,8 +81,36 @@ except Exception as e:
         model = None
 
 # Setting up pipeline
-pipe = pipeline("text-generation", model="timely/TimelyAI", device_map="balanced", torch_dtype=torch.bfloat16)
+pipe = pipeline("text-generation", model="timely/TimelyAI", device="cpu", torch_dtype=torch.bfloat16)
 
+@app.route('/add', methods=['POST'])
+def append_to_classifier():
+
+    # Get JSON
+    data = request.get_json()
+
+    # print(data)
+
+    if (request.method != 'POST'):
+        return jsonify({"Error": "Invalid method request type"}), 400
+
+    message = data['message'] if 'message' in data else ''
+
+    # print(message)
+
+    if not message:
+        return jsonify({"Error": "No message was sent to the backend"}), 400
+
+    # Checking if prompt has the proper attributes 
+    if not 'category' in message or not 'prompt' in message:
+        return jsonify({"Error": "Invalid formatting of message"}), 400
+
+    result = classifier.append(category=message['category'], prompt=message['prompt'])
+
+    if result == 1:
+        return jsonify({"Message": "Successful append!"}), 201
+    else:
+        return jsonify({"Error": "Failed to append!"}), 400    
 
 @app.route('/prompt', methods=['POST'])
 def verify():
@@ -93,7 +122,7 @@ def verify():
         return jsonify({"Error": "Invalid method request type"}), 400
 
     # Should contain an attribute named 'prompt'
-    prompt = data['prompt'] or ''
+    prompt = data['prompt'] if 'prompt' in data else ''
     
     if not prompt:
         return jsonify({"Error": "No prompt was sent to the backend"}), 400
@@ -127,4 +156,4 @@ def prompt_model(messages):
 
 # Run the backend
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=False, host="0.0.0.0", port=5000)
