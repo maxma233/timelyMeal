@@ -7,28 +7,57 @@ import os
 # import subprocess
 
 # Verifying and moving to correct location
-
 current_dir = Path(__file__).resolve().parent
 file_name_to_data = current_dir / 'timelymealsdiscreteannotated.csv'
+
+ACCEPTED_CATEGORIES = ["Valid", "Invalid"]
+DEFAULT_FILE_LOCATION = file_name_to_data 
 
 # os.chdir(os.getcwd() + '\\DiscreteClassifier')
 # print(f'Current Working Directory: {os.getcwd()}')
 # subprocess.run("dir", shell=True)
 
-def read_file() -> pd.DataFrame:
+def read_file(file_name: str) -> pd.DataFrame:
     """ 
         Building the data from the .csv file by
         parsing it into columns and then normalizing
         by tokenizing the input. 
         Returns: Pandas Dataframe containing the data
     """
-    data = pd.read_csv(str(file_name_to_data), skiprows=1, names=['type','text', 'c3', 'c4', 'c5'], delimiter=',', encoding='ISO-8859-1')
 
-    # Tokenizing the input
-    data['clean'] = data.text.apply(lambda x: x.lower().split())
-    data.drop(['c3', 'c4', 'c5'], axis=1, inplace=True)
+    try:
+        data = pd.read_csv(str(file_name), skiprows=1, names=['type','text', 'c3', 'c4', 'c5'], delimiter=',', encoding='ISO-8859-1')
+
+        # Tokenizing the input
+        data['clean'] = data.text.apply(lambda x: x.lower().split())
+        data.drop(['c3', 'c4', 'c5'], axis=1, inplace=True)
+    except FileNotFoundError as e:
+        print(e)
+        raise 
 
     return data
+
+def append_file(file_name: str, category: str, prompt: str) -> int:
+    """
+        Appends a data point to the .csv that can
+        be used from a reload() call from the 
+        Classifer.
+        Returns: 1 for valid append, 0 for failure
+    """
+
+    line_appended = False
+
+    try:
+        open_file = open(str(file_name), "a")
+    
+        # Append to file
+        open_file.write(f"\n{category},{prompt}")
+        line_appended = True
+    except Exception as e:
+        print(f"ERROR: {e}")
+    finally:
+        open_file.close()
+        return 1 if line_appended is True else 0
 
 def build_classifier_dict(data: pd.DataFrame) -> dict:
     """
@@ -51,13 +80,24 @@ def build_classifier_dict(data: pd.DataFrame) -> dict:
     return words_valid_invalid
 
 class Classifier:
-    def __init__(self):
+    def __init__(self, file_location: str):
         """ 
             Creates a discrete classifier from a provided dataset
             using helper functions. The purpose is to indicate whether
             a provided prompt is valid or invalid for our application.
         """
-        self.data = read_file()   
+
+        if (file_location):
+            self.file_location = file_location
+        else:
+            self.file_location = DEFAULT_FILE_LOCATION
+
+        try:
+            self.data = read_file(file_name=self.file_location)   
+        except Exception as e:
+            print("An error has occurred while reading the file.")
+            raise
+            
         self.valid_invalid_dict = build_classifier_dict(self.data)
 
         # Saved information for probability functions
@@ -76,6 +116,43 @@ class Classifier:
         invalid_case = self.Ps(tokenized_prompt, X='Invalid')
 
         return 1 if valid_case > invalid_case else 0
+    
+    def reload(self):
+        """
+            Reloads the classifier by checking the data again incase there is
+            new data in the .csv
+        """
+        try:
+            self.data = read_file(file_name=self.file_location)   
+        except Exception as e:
+            print("An error has occurred while reading the file.")
+        
+        self.valid_invalid_dict = build_classifier_dict(self.data)
+
+        self.type_ctr = ctr(self.data.type)
+        self.words_ctr = ctr([word for row in self.data.clean for word in row])
+
+    def append(self, category: str, prompt: str) -> int:
+        """
+            Adds a new instance of a valid or invalid prompt to the .csv
+            that the classifiers use.
+            Returns: 1 for valid append, 0 for failure
+        """
+
+        if category not in ACCEPTED_CATEGORIES:
+            return 0
+        
+        try:
+            append_file(self.file_location, category=category, prompt=prompt)
+        except Exception as e:
+            print(f"Failed to append new prompt to .csv at {self.file_location}")
+            return 0
+        finally:
+
+            # Reload tokens (for now)
+            self.reload()
+
+            return 1
 
     # Probability Helper functions   
     
@@ -102,4 +179,4 @@ if __name__ == "__main__":
     result = classifier.verify(prompt="Where is the zoo")
     
     print(result)
-    print('Done!')
+    print("Done!")
