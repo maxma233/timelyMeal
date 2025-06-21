@@ -10,7 +10,15 @@ import AssetExample from './components/AssetExample';
 
 export default function App() {
   const [text, setText] = useState('');
+  const [error, setError] = useState('');
+
+  const resetError = () => {
+    setError('');
+  }
+
   const handleSearch = async () => {
+
+    resetError();
 
     if (text.length === 0 || !text.trim()) {
       console.log("Empty search text");
@@ -26,7 +34,7 @@ export default function App() {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ prompt: text }),
+        body: JSON.stringify({ prompt: text.trim() }),
       });
 
 
@@ -34,6 +42,7 @@ export default function App() {
 
     // ON BAD CASE: Update UI
     if (!response.ok) {
+      setError(`Error: Invalid prompt!`);
       console.log("Invalid prompt!");
       return;
       // throw new Error(`Server Error: ${response.status}`);
@@ -45,35 +54,43 @@ export default function App() {
 
     // Send request to the backend to prompt model
 
-    // let output = undefined;
+    let output = undefined;
 
-    // const modelRequest = await fetch('http://127.0.0.1:5000/model',
-    //   {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json"
-    //     },
-    //     body: JSON.stringify({ prompt: text })
-    //   }
-    // ).then(async () => {
-    //   output = await modelRequest.json()
-    // }).catch(
-    //   // Return an error instead
-    //   console.error("Request to model API failed!")
-    // );
+    const modelRequest = await fetch('http://127.0.0.1:5000/model',
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ prompt: text.trim() })
+      }
+    ).then(async (value) => {
+      output = await value.json()
+    }).catch(
+      (reason) => {
+        // Return an error instead
+        setError(`Error: ${reason}`);
+        console.error(`Error: ${reason}`);
+      }
+    );
 
     // // Something went wrong when trying to grab the model's output
-    // if (!output) {
-    //   throw new Error("Model output failed to instantiate!");
-    // }
+    if (!output) {
+      setError(`Error: Model output failed to instantiate!`);
+      throw new Error("Model output failed to instantiate!");
+    }
 
     // Update UI from the model output
+
+    console.log(output);
 
     // console.log(data.message);
 
   }
 
   const handleNewPrompt = async (type) => {
+
+    resetError();
 
     let output = undefined;
 
@@ -90,11 +107,13 @@ export default function App() {
     ).catch(
       (reason) => {
         // Return an error instead
+        setError(`Error: ${reason}`);
         console.error(`Error: ${reason}`);
       }
     );
 
     if (!output) {
+      setError(`Error: Model output failed to instantiate!`);
       throw new Error("Model output failed to instantiate!");
     }
 
@@ -148,22 +167,24 @@ export default function App() {
         <div
           style={{ display: 'flex' }}>
           <button
-            style={{ ...styles.searchButton, ...styles.promptButton }}
+            style={{ ...styles.searchButton, ...styles.negativePromptButton }}
             onClick={() => {
               handleNewPrompt("Valid")
             }}
-          >False Negative</button>
+          >Should be valid</button>
           <button
-            style={{ ...styles.searchButton, ...styles.promptButton }}
+            style={{ ...styles.searchButton, ...styles.positivePromptButton }}
             onClick={() => {
               handleNewPrompt("Invalid")
             }}
-          >False Positive</button>
+          >Should be invalid</button>
         </div>
 
-        <Text style={{ color: '#FF0000' }}>
-          Error Placeholder
-        </Text>
+        {
+          error !== '' && <Text style={{ color: '#FF0000' }}>
+            {error}
+          </Text>
+        }
 
       </div>
 
@@ -235,7 +256,11 @@ const styles = StyleSheet.create({
     borderColor: '#000',
     borderWidth: '2px',
   },
-  promptButton: {
+  negativePromptButton: {
+    width: 80,
+    backgroundColor: '#0F0'
+  },
+  positivePromptButton: {
     width: 80,
   }
 });
