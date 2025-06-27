@@ -1,6 +1,7 @@
 import { Button, Text, SafeAreaView, StyleSheet, TextInput, View, Image } from 'react-native';
 import { useState } from 'react'
 import { Icon } from 'react-native-elements';
+import QuestionnaireWindow from './components/QuestionnaireWindow'
 
 // You can import supported modules from npm
 import { Card } from 'react-native-paper';
@@ -17,6 +18,8 @@ export default function App() {
   }
 
   const handleSearch = async () => {
+
+    const currentTime = new Date();
 
     resetError();
 
@@ -51,6 +54,7 @@ export default function App() {
     // Update UI to state valid case
     const data = await response.json();
     console.log("Valid prompt!");
+    console.log(`Request sent at: ${currentTime}`);
 
     // Send request to the backend to prompt model
 
@@ -66,18 +70,23 @@ export default function App() {
       }
     ).then(async (value) => {
       output = await value.json()
+      const responseReceived = new Date()
+
+      console.log(`Output completed at: ${responseReceived}`)
+      console.log(`Time Elapsed: ${currentTime - responseReceived}`)
+
     }).catch(
       (reason) => {
         // Return an error instead
         setError(`Error: ${reason}`);
-        console.error(`Error: ${reason}`);
+        // console.error(`Error: ${reason}`);
       }
     );
 
     // // Something went wrong when trying to grab the model's output
     if (!output) {
       setError(`Error: Model output failed to instantiate!`);
-      throw new Error("Model output failed to instantiate!");
+      // throw new Error("Model output failed to instantiate!");
     }
 
     // Update UI from the model output
@@ -108,13 +117,13 @@ export default function App() {
       (reason) => {
         // Return an error instead
         setError(`Error: ${reason}`);
-        console.error(`Error: ${reason}`);
+        // console.error(`Error: ${reason}`);
       }
     );
 
     if (!output) {
       setError(`Error: Model output failed to instantiate!`);
-      throw new Error("Model output failed to instantiate!");
+      // throw new Error("Model output failed to instantiate!");
     }
 
     console.log("Successful appending to dataset!");
@@ -143,11 +152,16 @@ export default function App() {
         </div>
       </div>
       <div style={{ margin: 'auto', marginTop: '10vw' }}>
-        <Text style={{ fontSize: '2.3rem', alignSelf: 'flex-start' }}>
-          What Would You Like to Eat?
-        </Text>
 
-        <div style={{ display: 'flex', }}>
+        <QuestionnaireWindow />
+
+
+
+        {/* <Text style={{ fontSize: '2.3rem', alignSelf: 'flex-start' }}>
+          What Would You Like to Eat?
+        </Text> */}
+
+        {/* <div style={{ display: 'flex', }}>
 
           <TextInput
             placeholder='What would you like to eat?'
@@ -162,9 +176,9 @@ export default function App() {
             <Icon name="arrow-right" type="entypo" size={24} color="white" />
           </button>
 
-        </div>
+        </div> */}
 
-        <div
+        {/* <div
           style={{ display: 'flex' }}>
           <button
             style={{ ...styles.searchButton, ...styles.negativePromptButton }}
@@ -178,7 +192,7 @@ export default function App() {
               handleNewPrompt("Invalid")
             }}
           >Should be invalid</button>
-        </div>
+        </div> */}
 
         {
           error !== '' && <Text style={{ color: '#FF0000' }}>
@@ -195,7 +209,7 @@ export default function App() {
 const styles = StyleSheet.create({
   navigation: {
     color: '#ffffff',
-    backgroundColor: '#ff4545',
+    backgroundColor: '#F44322',
     padding: '20px',
     display: 'flex',
     justifyContent: 'space-between',
