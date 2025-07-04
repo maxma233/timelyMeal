@@ -5,6 +5,7 @@ import QuestionnaireMap from "./QuestionnaireMap";
 import FoodTypeSelector from "./FoodTypeSelector";
 import DurationSelector from "./DurationSelector";
 import MealSelector from "./MealSelector"
+import PreferenceWindow from "./PreferenceWindow";
 
 const DEFAULT_QUESTIONNAIRE = ['How would you like to eat?',
     'How long do you need the plan to be?',
@@ -34,6 +35,8 @@ function QuestionnaireWindow() {
     //     }
     // }
 
+
+
     return (
         <View>
 
@@ -46,7 +49,7 @@ function QuestionnaireWindow() {
             <FoodTypeSelector foodTypeSetter={setFoodType} locationVal={locationVal} locationSetter={setLocationVal} />
             <DurationSelector durationVal={duration} durationSetter={setDuration} locationVal={locationVal} locationSetter={setLocationVal} />
             <MealSelector numMeals={numMeals} mealSetter={setNumMeals} locationVal={locationVal} locationSetter={setLocationVal} />
-
+            <PreferenceWindow preferences={preferences} preferenceSetter={setPreferences} locationVal={locationVal} locationSetter={setLocationVal} />
 
         </View>
     );
