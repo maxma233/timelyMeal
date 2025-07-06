@@ -1,6 +1,9 @@
-import { Text, View, Button } from "react-native"
+import { Button, View } from "react-native"
 
-function MealSelector({ numMeals, mealSetter, locationVal, locationSetter }) {
+function MealSelector(props) {
+
+    const { mealSetter, locationVal, locationSetter } = props;
+
 
     const mealHandler = (mealVal) => {
         mealSetter(mealVal);
@@ -15,9 +18,9 @@ function MealSelector({ numMeals, mealSetter, locationVal, locationSetter }) {
 
     return (
         <>
-            <Button title='2 Meals' onPress={(e) => mealHandler(2)}></Button>
-            <Button title='3 Meals' onPress={(e) => mealHandler(3)}></Button>
-            <Button title='4 Meals' onPress={(e) => mealHandler(4)}></Button>
+            <Button onPress={() => mealHandler(2)} title='2 Meals'></Button>
+            <Button onPress={() => mealHandler(3)} title='3 Meals'></Button>
+            <Button onPress={() => mealHandler(4)} title='4 Meals'></Button>
         </>
     );
 

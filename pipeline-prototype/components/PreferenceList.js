@@ -68,7 +68,7 @@ function PreferenceList({ preferences, preferenceSetter }) {
     const loadList = () => {
 
         return (
-            <View>
+            <View style={{ gap: '2px', padding: '20px' }}>
                 {currentList.list.map((item, index) => (
                     <View key={index} style={{ display: "flex" }}>
                         <PressableButton
@@ -86,11 +86,11 @@ function PreferenceList({ preferences, preferenceSetter }) {
                 <Text>Hello! Add new preference here:</Text>
                 <TextInput
                     placeholder="enter new cuisine type"
-                    style={styles.TextInput}
+                    style={{ marginBottom: '5px' }}
                     value={itemName}
                     onChangeText={(value) => setItemName(value)}
                 />
-                <View style={{ display: "flex" }}>
+                <View style={{ display: "flex", gap: '2px', width: '75%', alignSelf: 'center' }}>
                     <Button
                         title="Close"
                         onPress={() => setShowAddWindow(false)}
@@ -106,7 +106,7 @@ function PreferenceList({ preferences, preferenceSetter }) {
     }
 
     return (
-        <View>
+        <View style={{ width: '50%', alignSelf: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
             <ScrollView
                 style={styles.list}
             // showsVerticalScrollIndicator={true}
@@ -114,12 +114,14 @@ function PreferenceList({ preferences, preferenceSetter }) {
             >
                 {loadList()}
                 {!showAddWindow &&
-                    <Button
-                        title={"Add"}
-                        onPress={() => {
-                            setShowAddWindow(!showAddWindow)
-                        }}
-                    />
+                    <View style={{ width: '25%', alignSelf: 'center' }}>
+                        <Button
+                            title={"Add"}
+                            onPress={() => {
+                                setShowAddWindow(!showAddWindow)
+                            }}
+                        />
+                    </View>
                 }
 
             </ScrollView>
@@ -163,16 +165,18 @@ function PressableButton(PreferenceProps) {
 
 const styles = StyleSheet.create({
     popOutWindow: {
-
+        width: '50%',
+        alignSelf: 'center',
     },
     list: {
         maxHeight: 200,
+        width: '100%',
     },
     preferenceButton: {
         // padding: 10,
         borderRadius: 8,
         backgroundColor: "#FFF",
-        width: 200,
+        width: '100%',
     }
 });
 

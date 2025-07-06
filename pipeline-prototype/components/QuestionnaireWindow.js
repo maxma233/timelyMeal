@@ -6,6 +6,8 @@ import FoodTypeSelector from "./FoodTypeSelector";
 import DurationSelector from "./DurationSelector";
 import MealSelector from "./MealSelector"
 import PreferenceWindow from "./PreferenceWindow";
+import BackButton from "./BackButton";
+import { PageIndicator } from 'react-native-page-indicator';
 
 const DEFAULT_QUESTIONNAIRE = ['How would you like to eat?',
     'How long do you need the plan to be?',
@@ -38,20 +40,39 @@ function QuestionnaireWindow() {
 
 
     return (
-        <View>
+        <View style={{ width: '75vw' }}>
 
             <QuestionnaireMap locationVal={locationVal} />
 
-            <Text style={{ fontSize: '2.3rem', alignSelf: 'flex-start' }}>
-                {DEFAULT_QUESTIONNAIRE[locationVal]}
-            </Text>
+            <View>
 
-            <FoodTypeSelector foodTypeSetter={setFoodType} locationVal={locationVal} locationSetter={setLocationVal} />
-            <DurationSelector durationVal={duration} durationSetter={setDuration} locationVal={locationVal} locationSetter={setLocationVal} />
-            <MealSelector numMeals={numMeals} mealSetter={setNumMeals} locationVal={locationVal} locationSetter={setLocationVal} />
-            <PreferenceWindow preferences={preferences} preferenceSetter={setPreferences} locationVal={locationVal} locationSetter={setLocationVal} />
 
-        </View>
+                <div style={{ display: 'flex' }}>
+                    <BackButton locationVal={locationVal} locationSetter={setLocationVal} />
+                    <Text style={{ fontSize: '2.3rem' }}>
+                        {DEFAULT_QUESTIONNAIRE[locationVal]}
+                    </Text>
+                </div>
+
+
+                <View style={{ alignSelf: 'flex-start', left: 0, display: 'flex', flexDirection: 'row', gap: '20px' }}>
+                    <PageIndicator style={{ marginVertical: 'auto' }} vertical={true} count={4} current={locationVal} />
+
+                    <View style={{ display: 'flex', flexDirection: 'row', gap: '20px', margin: 'auto', width: '100%', justifyContent: 'space-evenly' }}>
+                        <FoodTypeSelector foodTypeSetter={setFoodType} locationVal={locationVal} locationSetter={setLocationVal} />
+                        <DurationSelector durationVal={duration} durationSetter={setDuration} locationVal={locationVal} locationSetter={setLocationVal} />
+                        <MealSelector mealSetter={setNumMeals} locationVal={locationVal} locationSetter={setLocationVal} />
+                        <PreferenceWindow preferences={preferences} preferenceSetter={setPreferences} locationVal={locationVal} locationSetter={setLocationVal} />
+                    </View>
+
+                </View>
+
+
+
+            </View>
+
+
+        </View >
     );
 }
 

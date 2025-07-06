@@ -25,22 +25,8 @@ function DurationSelector({ durationVal, durationSetter, locationVal, locationSe
 
     return (
         <>
-            <View>
-
-
-                <input type='number' min={1} max={30} onChange={durationHandler}></input>
-                <Button title='Next' onPress={submitHandler} />
-
-                {/* 
-                <Slider
-                    style={{ width: 200, height: 20 }}
-                    minimumValue={1}
-                    maximumValue={30}
-                    step={1}
-                    onValueChange={durationHandler}
-                /> */}
-                {/* <Text>Duration: {durationVal}</Text> */}
-            </View>
+            <input type='number' min={1} max={30} onChange={durationHandler} value={durationVal}></input>
+            <Button title='Next' onPress={submitHandler} />
         </>
     );
 

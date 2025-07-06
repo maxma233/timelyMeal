@@ -38,14 +38,18 @@ function PreferenceWindow({ preferences, preferenceSetter, locationVal, location
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        position: 'relative',
+        // flex: 1,
+        // position: 'relative',
+        margin: 'auto',
+        width: '75vw'
+
+
     },
     buttonContainer: {
-        // zIndex: 1 | undefined,
-        position: 'absolute',
-        top: 300,
-        left: 250,
+        zIndex: 10 | undefined,
+        position: 'fixed',
+        right: '15%',
+        bottom: '5%',
         minWidth: 100,
 
     },

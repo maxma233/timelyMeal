@@ -1,4 +1,4 @@
-import { Button } from "react-native";
+import { Button, View } from "react-native";
 
 const FoodTypeSelector = ({ foodTypeSetter, locationVal, locationSetter }) => {
 
@@ -15,7 +15,6 @@ const FoodTypeSelector = ({ foodTypeSetter, locationVal, locationSetter }) => {
 
     return (
         <>
-
             <Button
                 title="Takeout"
                 onPress={() => {
@@ -29,8 +28,8 @@ const FoodTypeSelector = ({ foodTypeSetter, locationVal, locationSetter }) => {
                 }}
             />
 
-        </>
 
+        </>
     );
 }
 
