@@ -41,8 +41,8 @@ const styles = StyleSheet.create({
         // flex: 1,
         // position: 'relative',
         margin: 'auto',
-        width: '75vw'
-
+        width: '75vw',
+        height: '100%',
 
     },
     buttonContainer: {

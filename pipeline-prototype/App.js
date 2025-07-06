@@ -2,6 +2,7 @@ import { Button, Text, SafeAreaView, StyleSheet, TextInput, View, Image } from '
 import { useState } from 'react'
 import { Icon } from 'react-native-elements';
 import QuestionnaireWindow from './components/QuestionnaireWindow'
+import ImageScroller from './components/ImageScroller';
 
 // You can import supported modules from npm
 import { Card } from 'react-native-paper';
@@ -151,7 +152,16 @@ export default function App() {
           </Text>
         </div>
       </div>
-      <div style={{ margin: 'auto', marginTop: '10vw' }}>
+
+      <View>
+
+        {/* Put image scroller here */}
+        <ImageScroller />
+
+      </View>
+
+
+      <div style={{ margin: 'auto', marginTop: '2vw' }}>
 
         <QuestionnaireWindow />
 
@@ -227,7 +237,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     textAlign: 'left',
-    backgroundColor: '#fef7ff',
+    backgroundColor: '#F44322',
     // textAlignVertical: 'bottom',
     padding: 8,
   },

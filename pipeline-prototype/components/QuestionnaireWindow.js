@@ -6,6 +6,7 @@ import FoodTypeSelector from "./FoodTypeSelector";
 import DurationSelector from "./DurationSelector";
 import MealSelector from "./MealSelector"
 import PreferenceWindow from "./PreferenceWindow";
+import CravingWindow from "./CravingWindow";
 import BackButton from "./BackButton";
 import { PageIndicator } from 'react-native-page-indicator';
 
@@ -18,7 +19,7 @@ const DEFAULT_QUESTIONNAIRE = ['How would you like to eat?',
     'Do you need help scheduling?'];
 
 function QuestionnaireWindow() {
-    const [locationVal, setLocationVal] = useState(0);
+    const [locationVal, setLocationVal] = useState(4);
     const [foodType, setFoodType] = useState('');
     const [duration, setDuration] = useState(0);
     const [numMeals, setNumMeals] = useState(0);
@@ -56,13 +57,14 @@ function QuestionnaireWindow() {
 
 
                 <View style={{ alignSelf: 'flex-start', left: 0, display: 'flex', flexDirection: 'row', gap: '20px' }}>
-                    <PageIndicator style={{ marginVertical: 'auto' }} vertical={true} count={4} current={locationVal} />
+                    <PageIndicator style={{ alignSelf: 'flex-start' }} vertical={true} count={7} current={locationVal} />
 
                     <View style={{ display: 'flex', flexDirection: 'row', gap: '20px', margin: 'auto', width: '100%', justifyContent: 'space-evenly' }}>
                         <FoodTypeSelector foodTypeSetter={setFoodType} locationVal={locationVal} locationSetter={setLocationVal} />
                         <DurationSelector durationVal={duration} durationSetter={setDuration} locationVal={locationVal} locationSetter={setLocationVal} />
                         <MealSelector mealSetter={setNumMeals} locationVal={locationVal} locationSetter={setLocationVal} />
                         <PreferenceWindow preferences={preferences} preferenceSetter={setPreferences} locationVal={locationVal} locationSetter={setLocationVal} />
+                        <CravingWindow preferences={preferences} preferenceSetter={setPreferences} locationVal={locationVal} locationSetter={setLocationVal} />
                     </View>
 
                 </View>
