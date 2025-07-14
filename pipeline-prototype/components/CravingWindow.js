@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useRef, useContext, createContext } from 'react';
-import { View, StyleSheet, TextInput, Button, Pressable, Image, Animated, Text } from 'react-native';
+import { View, StyleSheet, TextInput, Button, Pressable, Image, Animated, Text, VirtualizedList } from 'react-native';
 import { ShoppingBasket03Icon, ListViewIcon, AddToListIcon } from 'hugeicons-react';
 import { List } from '../assets/images.js';
 import ListTransition from '../components/ListTransition.js';
-import NumericInput from 'react-native-numeric-input';
 import QuantityInput from './QuantityInput';
 import Icon from 'react-native-vector-icons/Ionicons';
-
+import { Grid } from 'react-virtualized';
 
 
 export const ElementContext = createContext(null);
@@ -23,6 +22,7 @@ function CravingWindow({ preferences, preferenceSetter, locationVal, locationSet
     const ref = useRef(null);
     const searchRef = useRef(null);
 
+
     useEffect(() => {
 
         setComponentLoaded(true);
@@ -37,6 +37,11 @@ function CravingWindow({ preferences, preferenceSetter, locationVal, locationSet
         return;
     }
 
+    // VirtualizedList helper functions
+    const getItem = (data, index) => data[index];
+    const getItemCount = (data) => data.length;
+
+
     const addToCart = (e) => {
 
         if (!craving.trim()) {
@@ -44,9 +49,13 @@ function CravingWindow({ preferences, preferenceSetter, locationVal, locationSet
             return;
         }
 
+        const newDish = { id: undefined, name: undefined };
+        newDish.id = Date.now().toString();
+        newDish.name = craving;
 
+        console.log("New Dish: ", newDish);
 
-        shoppingCart.dishes.push(craving);
+        shoppingCart.dishes.push(newDish);
 
         console.log("Added to cart: ", craving);
         console.log("Current cart: ", shoppingCart);
@@ -65,14 +74,37 @@ function CravingWindow({ preferences, preferenceSetter, locationVal, locationSet
         return (
             <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflowY: 'scroll', textAlign: 'center' }}>
                 <Text style={{ fontSize: '1.5rem', padding: '10px', width: '100%', textAlign: 'center' }}>Dishes</Text>
-                {shoppingCart.dishes.map((value, index) => (
+                <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', width: '100%' }}>
+                    <Text>Quantity</Text>
+                    <Text style={{ textAlign: 'left' }}>Dish Name</Text>
+                </View>
+
+                {/* VirtualizedList for displaying the active list */}
+                <VirtualizedList
+                    data={shoppingCart["dishes"]}
+                    getItem={getItem}
+                    getItemCount={getItemCount}
+                    keyExtractor={item => item.id}
+                    style={{ width: '100%' }}
+
+                    renderItem={({ item }) => (
+                        <View
+                            style={{ fontSize: '1.2rem', padding: '10px', margin: 0, width: '100%' }}
+                        >
+                            <CravingListElement item={item} shoppingCart={shoppingCart} setShoppingCart={setShoppingCart} />
+                        </View>
+                    )}
+                />
+
+
+                {/* {shoppingCart.dishes.map((value, index) => (
                     <View
                         key={index}
                         style={{ fontSize: '1.2rem', padding: '10px', margin: 0, width: '100%' }}
                     >
                         <CravingListElement name={value} shoppingCart={shoppingCart} setShoppingCart={setShoppingCart} />
                     </View>
-                ))}
+                ))} */}
             </View>
         );
 
@@ -152,15 +184,19 @@ function CravingWindow({ preferences, preferenceSetter, locationVal, locationSet
 
 }
 
-function CravingListElement({ name, shoppingCart, setShoppingCart }) {
+function CravingListElement({ item, shoppingCart, setShoppingCart }) {
 
-    const title = name;
+
+    console.log("item: ", item);
+    const listElement = item;
+
+    const id = item.id;
     const [quantity, setQuantity] = useState(1);
 
     const deleteItem = () => {
         console.log('shopping cart', shoppingCart)
 
-        const updatedList = shoppingCart["dishes"].filter((value, index) => (value !== title));
+        const updatedList = shoppingCart["dishes"].filter((value, index) => (value.id !== id));
 
         setShoppingCart({ ...shoppingCart, dishes: [...updatedList] });
         console.log(shoppingCart);
@@ -168,21 +204,25 @@ function CravingListElement({ name, shoppingCart, setShoppingCart }) {
 
 
     return (
-        <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: 10 }}>
+        <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: '100%', padding: 10 }}>
 
-            <QuantityInput quantity={quantity} setQuantity={setQuantity} />
+            <View style={{ flex: 1 }}>
+                <QuantityInput quantity={quantity} setQuantity={setQuantity} onButtonDeletion={deleteItem} />
+            </View>
 
-            <Text style={{ textAlign: 'center' }}>
-                {title}
-            </Text>
+            <View style={{ flex: 1 }}>
+                <Text style={{ textAlign: 'left' }}>
+                    {item.name}
+                </Text>
+            </View>
 
-            <Pressable
+            {/* <Pressable
                 onPress={deleteItem}
             >
                 <Icon name='trash' type='material' size={15} color="#333"></Icon>
-            </Pressable>
+            </Pressable> */}
 
-        </View >
+        </View>
     );
 
 }
