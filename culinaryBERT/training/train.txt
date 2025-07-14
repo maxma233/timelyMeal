@@ -1,0 +1,2424 @@
+I O
+ordered O
+Pad B-DISH
+Thai I-DISH
+for O
+dinner O
+. O
+
+We O
+enjoyed O
+Margherita B-DISH
+Pizza I-DISH
+last O
+night O
+. O
+
+The O
+Chicken B-DISH
+Tikka I-DISH
+Masala I-DISH
+was O
+spicy O
+. O
+
+She O
+tried O
+Beef B-DISH
+Tacos I-DISH
+at O
+the O
+festival O
+. O
+
+He O
+loves O
+Sushi B-DISH
+Rolls I-DISH
+with O
+soy O
+sauce O
+. O
+
+We O
+had O
+Eggs B-DISH
+Benedict I-DISH
+for O
+brunch O
+. O
+
+The O
+Spaghetti B-DISH
+Carbonara I-DISH
+was O
+creamy O
+. O
+
+I O
+ate O
+Pho B-DISH
+Ga I-DISH
+for O
+lunch O
+. O
+
+They O
+ordered O
+Dim B-DISH
+Sum I-DISH
+on O
+Sunday O
+. O
+
+We O
+tried O
+Falafel B-DISH
+Wrap I-DISH
+at O
+the O
+market O
+. O
+
+The O
+Butter B-DISH
+Chicken I-DISH
+was O
+delicious O
+. O
+
+I O
+ordered O
+California B-DISH
+Roll I-DISH
+for O
+takeout O
+. O
+
+She O
+enjoyed O
+Paella B-DISH
+Valenciana I-DISH
+last O
+week O
+. O
+
+We O
+had O
+Biryani B-DISH
+for O
+dinner O
+. O
+
+The O
+Caesar B-DISH
+Salad I-DISH
+was O
+fresh O
+and O
+crisp O
+. O
+
+He O
+tried O
+Kung B-DISH
+Pao I-DISH
+Chicken I-DISH
+yesterday O
+. O
+
+I O
+love O
+Guacamole B-DISH
+and O
+Chips B-DISH
+as O
+an O
+appetizer O
+. O
+
+We O
+ate O
+Lasagna B-DISH
+Bolognese I-DISH
+last O
+night O
+. O
+
+The O
+Miso B-DISH
+Soup I-DISH
+was O
+warm O
+and O
+savory O
+. O
+
+She O
+ordered O
+Enchiladas B-DISH
+Verdes I-DISH
+for O
+lunch O
+. O
+
+We O
+had O
+Peking B-DISH
+Duck I-DISH
+at O
+the O
+party O
+. O
+
+The O
+Tiramisu B-DISH
+was O
+a O
+perfect O
+dessert O
+. O
+
+I O
+tried O
+Ramen B-DISH
+with O
+pork O
+broth O
+. O
+
+They O
+enjoyed O
+Chana B-DISH
+Masala I-DISH
+for O
+dinner O
+. O
+
+We O
+ordered O
+Hummus B-DISH
+and O
+Pita B-DISH
+Bread I-DISH
+. O
+
+The O
+Pancakes B-DISH
+were O
+fluffy O
+and O
+sweet O
+. O
+
+I O
+ate O
+Sashimi B-DISH
+Platter I-DISH
+last O
+weekend O
+. O
+
+She O
+loves O
+Fettuccine B-DISH
+Alfredo I-DISH
+with O
+shrimp O
+. O
+
+We O
+had O
+Tandoori B-DISH
+Chicken I-DISH
+for O
+lunch O
+. O
+
+The O
+Spring B-DISH
+Rolls I-DISH
+were O
+crisp O
+and O
+fresh O
+. O
+
+He O
+tried O
+Beef B-DISH
+Bulgogi I-DISH
+at O
+the O
+food O
+truck O
+. O
+
+I O
+ordered O
+Caprese B-DISH
+Salad I-DISH
+for O
+a O
+light O
+meal O
+. O
+
+We O
+enjoyed O
+Chicken B-DISH
+Shawarma I-DISH
+yesterday O
+. O
+
+The O
+Gyoza B-DISH
+were O
+perfectly O
+crispy O
+. O
+
+She O
+ate O
+Palak B-DISH
+Paneer I-DISH
+last O
+night O
+. O
+
+We O
+had O
+Fish B-DISH
+and I-DISH
+Chips I-DISH
+at O
+the O
+pub O
+. O
+
+The O
+Pad B-DISH
+See I-DISH
+Ew I-DISH
+was O
+flavorful O
+. O
+
+I O
+tried O
+Mango B-DISH
+Sticky I-DISH
+Rice I-DISH
+for O
+dessert O
+. O
+
+They O
+ordered O
+Quesadillas B-DISH
+with O
+cheese O
+. O
+
+We O
+ate O
+Chicken B-DISH
+Parmesan I-DISH
+for O
+dinner O
+. O
+
+The O
+Tom B-DISH
+Yum I-DISH
+Soup I-DISH
+was O
+spicy O
+and O
+tangy O
+. O
+
+I O
+enjoyed O
+Ceviche B-DISH
+at O
+the O
+beach O
+. O
+
+She O
+ordered O
+Bibimbap B-DISH
+for O
+lunch O
+. O
+
+We O
+had O
+Stuffed B-DISH
+Peppers I-DISH
+last O
+week O
+. O
+
+The O
+Samosas B-DISH
+were O
+crisp O
+and O
+savory O
+. O
+
+I O
+tried O
+Chili B-DISH
+Con I-DISH
+Carne I-DISH
+at O
+the O
+fair O
+. O
+
+They O
+enjoyed O
+Shrimp B-DISH
+Scampi I-DISH
+for O
+dinner O
+. O
+
+We O
+ordered O
+Naan B-DISH
+with O
+Garlic B-DISH
+Butter I-DISH
+. O
+
+The O
+Ravioli B-DISH
+was O
+filled O
+with O
+ricotta O
+. O
+
+I O
+ate O
+Katsu B-DISH
+Curry I-DISH
+for O
+lunch O
+. O
+
+I O
+ordered O
+Tom B-DISH
+Kha I-DISH
+Gai I-DISH
+for O
+lunch O
+. O
+
+We O
+enjoyed O
+Chicken B-DISH
+Alfredo I-DISH
+last O
+night O
+. O
+
+The O
+Beef B-DISH
+Barbacoa I-DISH
+Tacos I-DISH
+were O
+savory O
+. O
+
+She O
+tried O
+Vegetable B-DISH
+Lo I-DISH
+Mein I-DISH
+at O
+the O
+market O
+. O
+
+He O
+loves O
+Grilled B-DISH
+Salmon I-DISH
+with O
+lemon O
+sauce O
+. O
+
+We O
+had O
+French B-DISH
+Toast I-DISH
+for O
+brunch O
+. O
+
+The O
+Penne B-DISH
+Arrabbiata I-DISH
+was O
+spicy O
+. O
+
+I O
+ate O
+Bun B-DISH
+Bo I-DISH
+Hue I-DISH
+yesterday O
+. O
+
+They O
+ordered O
+Shumai B-DISH
+at O
+the O
+festival O
+. O
+
+We O
+tried O
+Hummus B-DISH
+Plate I-DISH
+with O
+veggies O
+. O
+
+The O
+Lamb B-DISH
+Vindaloo I-DISH
+was O
+fiery O
+and O
+bold O
+. O
+
+I O
+ordered O
+Dragon B-DISH
+Roll I-DISH
+for O
+dinner O
+. O
+
+She O
+enjoyed O
+Seafood B-DISH
+Paella I-DISH
+last O
+weekend O
+. O
+
+We O
+had O
+Mutton B-DISH
+Biryani I-DISH
+at O
+the O
+party O
+. O
+
+The O
+Greek B-DISH
+Salad I-DISH
+was O
+fresh O
+and O
+tangy O
+. O
+
+He O
+tried O
+General B-DISH
+Tso’s I-DISH
+Chicken I-DISH
+for O
+lunch O
+. O
+
+I O
+love O
+Nachos B-DISH
+Supreme I-DISH
+as O
+an O
+appetizer O
+. O
+
+We O
+ate O
+Ravioli B-DISH
+Marinara I-DISH
+last O
+night O
+. O
+
+The O
+Miso B-DISH
+Ramen I-DISH
+was O
+warm O
+and O
+hearty O
+. O
+
+She O
+ordered O
+Chicken B-DISH
+Enchiladas I-DISH
+for O
+dinner O
+. O
+
+We O
+had O
+Crispy B-DISH
+Duck I-DISH
+at O
+the O
+banquet O
+. O
+
+The O
+Cheesecake B-DISH
+was O
+creamy O
+and O
+sweet O
+. O
+
+I O
+tried O
+Tonkotsu B-DISH
+Ramen I-DISH
+last O
+week O
+. O
+
+They O
+enjoyed O
+Saag B-DISH
+Paneer I-DISH
+for O
+lunch O
+. O
+
+We O
+ordered O
+Falafel B-DISH
+Pita I-DISH
+at O
+the O
+food O
+truck O
+. O
+
+The O
+Blueberry B-DISH
+Pancakes I-DISH
+were O
+fluffy O
+. O
+
+I O
+ate O
+Tuna B-DISH
+Sashimi I-DISH
+for O
+dinner O
+. O
+
+She O
+loves O
+Spaghetti B-DISH
+Bolognese I-DISH
+with O
+parmesan O
+. O
+
+We O
+had O
+Tandoori B-DISH
+Prawns I-DISH
+last O
+night O
+. O
+
+The O
+Spring B-DISH
+Rolls I-DISH
+were O
+light O
+and O
+crisp O
+. O
+
+He O
+tried O
+Beef B-DISH
+Bibimbap I-DISH
+at O
+the O
+fair O
+. O
+
+I O
+ordered O
+Cobb B-DISH
+Salad I-DISH
+for O
+a O
+quick O
+meal O
+. O
+
+We O
+enjoyed O
+Lamb B-DISH
+Kebabs I-DISH
+yesterday O
+. O
+
+The O
+Pork B-DISH
+Dumplings I-DISH
+were O
+juicy O
+. O
+
+She O
+ate O
+Aloo B-DISH
+Gobi I-DISH
+for O
+dinner O
+. O
+
+We O
+had O
+Fish B-DISH
+Tacos I-DISH
+at O
+the O
+beach O
+. O
+
+The O
+Pad B-DISH
+Kee I-DISH
+Mao I-DISH
+was O
+spicy O
+. O
+
+I O
+tried O
+Coconut B-DISH
+Rice I-DISH
+Pudding I-DISH
+for O
+dessert O
+. O
+
+They O
+ordered O
+Cheese B-DISH
+Quesadillas I-DISH
+for O
+lunch O
+. O
+
+We O
+ate O
+Veal B-DISH
+Marsala I-DISH
+last O
+week O
+. O
+
+The O
+Hot B-DISH
+and I-DISH
+Sour I-DISH
+Soup I-DISH
+was O
+tangy O
+. O
+
+I O
+enjoyed O
+Shrimp B-DISH
+Ceviche I-DISH
+by O
+the O
+coast O
+. O
+
+She O
+ordered O
+Dolsot B-DISH
+Bibimbap I-DISH
+for O
+dinner O
+. O
+
+We O
+had O
+Stuffed B-DISH
+Mushrooms I-DISH
+as O
+an O
+appetizer O
+. O
+
+The O
+Vegetable B-DISH
+Samosas I-DISH
+were O
+crispy O
+. O
+
+I O
+tried O
+Chili B-DISH
+Rellenos I-DISH
+at O
+the O
+festival O
+. O
+
+They O
+enjoyed O
+Lobster B-DISH
+Risotto I-DISH
+last O
+night O
+. O
+
+We O
+ordered O
+Garlic B-DISH
+Naan I-DISH
+with O
+curry O
+. O
+
+The O
+Spinach B-DISH
+Ravioli I-DISH
+was O
+savory O
+. O
+
+I O
+ate O
+Chicken B-DISH
+Katsu I-DISH
+for O
+lunch O
+. O
+
+She O
+tried O
+Mango B-DISH
+Lassi I-DISH
+as O
+a O
+drink O
+. O
+
+We O
+had O
+Beef B-DISH
+Empanadas I-DISH
+at O
+the O
+market O
+. O
+
+The O
+Caprese B-DISH
+Pizza I-DISH
+was O
+fresh O
+and O
+light O
+. O
+
+I O
+ordered O
+Pork B-DISH
+Banh I-DISH
+Mi I-DISH
+for O
+lunch O
+. O
+
+They O
+enjoyed O
+Butter B-DISH
+Naan I-DISH
+with O
+paneer O
+. O
+
+We O
+ate O
+Shrimp B-DISH
+Pad I-DISH
+Thai I-DISH
+last O
+night O
+. O
+
+The O
+Clam B-DISH
+Chowder I-DISH
+was O
+creamy O
+. O
+
+I O
+tried O
+Vegetable B-DISH
+Tempura I-DISH
+for O
+dinner O
+. O
+
+She O
+ordered O
+Churros B-DISH
+for O
+dessert O
+. O
+
+We O
+had O
+Chicken B-DISH
+Satay I-DISH
+as O
+an O
+appetizer O
+. O
+
+The O
+Lentil B-DISH
+Soup I-DISH
+was O
+hearty O
+. O
+
+I O
+enjoyed O
+Tuna B-DISH
+Tataki I-DISH
+last O
+week O
+. O
+
+They O
+ate O
+Palak B-DISH
+Chaat I-DISH
+at O
+the O
+fair O
+. O
+
+We O
+ordered O
+Crab B-DISH
+Rangoon I-DISH
+for O
+the O
+party O
+. O
+
+The O
+Waffles B-DISH
+were O
+golden O
+and O
+crisp O
+. O
+
+I O
+tried O
+Salmon B-DISH
+Sushi I-DISH
+for O
+dinner O
+. O
+
+She O
+loves O
+Pesto B-DISH
+Pasta I-DISH
+with O
+pine O
+nuts O
+. O
+
+We O
+had O
+Tandoori B-DISH
+Fish I-DISH
+last O
+night O
+. O
+
+The O
+Egg B-DISH
+Rolls I-DISH
+were O
+crunchy O
+. O
+
+He O
+tried O
+Pork B-DISH
+Bulgogi I-DISH
+at O
+the O
+market O
+. O
+
+I O
+ordered O
+Waldorf B-DISH
+Salad I-DISH
+for O
+lunch O
+. O
+
+We O
+enjoyed O
+Beef B-DISH
+Shawarma I-DISH
+yesterday O
+. O
+
+The O
+Steamed B-DISH
+Buns I-DISH
+were O
+soft O
+and O
+flavorful O
+. O
+
+She O
+ate O
+Rogan B-DISH
+Josh I-DISH
+for O
+dinner O
+. O
+
+We O
+had O
+Shrimp B-DISH
+Tacos I-DISH
+at O
+the O
+beach O
+. O
+
+The O
+Drunken B-DISH
+Noodles I-DISH
+were O
+spicy O
+. O
+
+I O
+tried O
+Rice B-DISH
+Pudding I-DISH
+for O
+dessert O
+. O
+
+They O
+ordered O
+Chicken B-DISH
+Quesadillas I-DISH
+for O
+lunch O
+. O
+
+We O
+ate O
+Eggplant B-DISH
+Parmesan I-DISH
+last O
+week O
+. O
+
+The O
+Wonton B-DISH
+Soup I-DISH
+was O
+savory O
+. O
+
+I O
+enjoyed O
+Fish B-DISH
+Ceviche I-DISH
+by O
+the O
+coast O
+. O
+
+She O
+ordered O
+Tofu B-DISH
+Bibimbap I-DISH
+for O
+dinner O
+. O
+
+We O
+had O
+Stuffed B-DISH
+Zucchini I-DISH
+as O
+an O
+appetizer O
+. O
+
+The O
+Meat B-DISH
+Samosas I-DISH
+were O
+crispy O
+. O
+
+I O
+tried O
+Pork B-DISH
+Tamales I-DISH
+at O
+the O
+festival O
+. O
+
+They O
+enjoyed O
+Clam B-DISH
+Risotto I-DISH
+last O
+night O
+. O
+
+We O
+ordered O
+Plain B-DISH
+Naan I-DISH
+with O
+curry O
+. O
+
+The O
+Mushroom B-DISH
+Ravioli I-DISH
+was O
+savory O
+. O
+
+I O
+ate O
+Tofu B-DISH
+Katsu I-DISH
+for O
+lunch O
+. O
+
+She O
+tried O
+Strawberry B-DISH
+Lassi I-DISH
+as O
+a O
+drink O
+. O
+
+We O
+had O
+Chicken B-DISH
+Empanadas I-DISH
+at O
+the O
+market O
+. O
+
+The O
+Pepperoni B-DISH
+Pizza I-DISH
+was O
+cheesy O
+. O
+
+I O
+ordered O
+Beef B-DISH
+Banh I-DISH
+Mi I-DISH
+for O
+lunch O
+. O
+
+They O
+enjoyed O
+Tandoori B-DISH
+Naan I-DISH
+with O
+paneer O
+. O
+
+We O
+ate O
+Prawn B-DISH
+Pad I-DISH
+Thai I-DISH
+last O
+night O
+. O
+
+The O
+Lobster B-DISH
+Bisque I-DISH
+was O
+creamy O
+. O
+
+I O
+tried O
+Shrimp B-DISH
+Tempura I-DISH
+for O
+dinner O
+. O
+
+She O
+ordered O
+Flan B-DISH
+for O
+dessert O
+. O
+
+We O
+had O
+Beef B-DISH
+Satay I-DISH
+as O
+an O
+appetizer O
+. O
+
+The O
+Minestrone B-DISH
+Soup I-DISH
+was O
+hearty O
+. O
+
+I O
+enjoyed O
+Eel B-DISH
+Sushi I-DISH
+last O
+week O
+. O
+
+They O
+ate O
+Pani B-DISH
+Puri I-DISH
+at O
+the O
+fair O
+. O
+
+We O
+ordered O
+Pork B-DISH
+Wontons I-DISH
+for O
+the O
+party O
+. O
+
+The O
+Crepes B-DISH
+were O
+light O
+and O
+sweet O
+. O
+
+I O
+tried O
+Yellowtail B-DISH
+Sashimi I-DISH
+for O
+dinner O
+. O
+
+She O
+loves O
+Truffle B-DISH
+Pasta I-DISH
+with O
+mushrooms O
+. O
+
+We O
+had O
+Tandoori B-DISH
+Lamb I-DISH
+last O
+night O
+. O
+
+The O
+Crab B-DISH
+Cakes I-DISH
+were O
+crisp O
+. O
+
+He O
+tried O
+Chicken B-DISH
+Bulgogi I-DISH
+at O
+the O
+market O
+. O
+
+I O
+ordered O
+Antipasto B-DISH
+Salad I-DISH
+for O
+lunch O
+. O
+
+We O
+enjoyed O
+Pork B-DISH
+Shawarma I-DISH
+yesterday O
+. O
+
+The O
+Bao B-DISH
+Buns I-DISH
+were O
+soft O
+and O
+juicy O
+. O
+
+She O
+ate O
+Korma B-DISH
+Chicken I-DISH
+for O
+dinner O
+. O
+
+We O
+had O
+Crab B-DISH
+Tacos I-DISH
+at O
+the O
+beach O
+. O
+
+The O
+Green B-DISH
+Curry I-DISH
+was O
+spicy O
+. O
+
+I O
+tried O
+Tapioca B-DISH
+Pudding I-DISH
+for O
+dessert O
+. O
+
+They O
+ordered O
+Beef B-DISH
+Quesadillas I-DISH
+for O
+lunch O
+. O
+
+We O
+ate O
+Chicken B-DISH
+Piccata I-DISH
+last O
+week O
+. O
+
+The O
+Egg B-DISH
+Drop I-DISH
+Soup I-DISH
+was O
+savory O
+. O
+
+I O
+enjoyed O
+Octopus B-DISH
+Ceviche I-DISH
+by O
+the O
+coast O
+. O
+
+She O
+ordered O
+Vegetable B-DISH
+Bibimbap I-DISH
+for O
+dinner O
+. O
+
+We O
+had O
+Stuffed B-DISH
+Eggplant I-DISH
+as O
+an O
+appetizer O
+. O
+
+The O
+Chicken B-DISH
+Samosas I-DISH
+were O
+crispy O
+. O
+
+I O
+tried O
+Beef B-DISH
+Tamales I-DISH
+at O
+the O
+festival O
+. O
+
+They O
+enjoyed O
+Shrimp B-DISH
+Risotto I-DISH
+last O
+night O
+. O
+
+We O
+ordered O
+Masala B-DISH
+Naan I-DISH
+with O
+curry O
+. O
+
+The O
+Cheese B-DISH
+Ravioli I-DISH
+was O
+savory O
+. O
+
+I O
+ate O
+Pork B-DISH
+Katsu I-DISH
+for O
+lunch O
+. O
+
+She O
+tried O
+Pineapple B-DISH
+Lassi I-DISH
+as O
+a O
+drink O
+. O
+
+We O
+had O
+Vegetable B-DISH
+Empanadas I-DISH
+at O
+the O
+market O
+. O
+
+The O
+Hawaiian B-DISH
+Pizza I-DISH
+was O
+sweet O
+and O
+savory O
+. O
+
+I O
+ordered O
+Chicken B-DISH
+Banh I-DISH
+Mi I-DISH
+for O
+lunch O
+. O
+
+They O
+enjoyed O
+Plain B-DISH
+Naan I-DISH
+with O
+paneer O
+. O
+
+We O
+ate O
+Tofu B-DISH
+Pad I-DISH
+Thai I-DISH
+last O
+night O
+. O
+
+The O
+Oyster B-DISH
+Chowder I-DISH
+was O
+creamy O
+. O
+
+I O
+tried O
+Ebi B-DISH
+Tempura I-DISH
+for O
+dinner O
+. O
+
+She O
+ordered O
+Tres B-DISH
+Leches I-DISH
+for O
+dessert O
+. O
+
+We O
+had O
+Lamb B-DISH
+Satay I-DISH
+as O
+an O
+appetizer O
+. O
+
+The O
+Vegetable B-DISH
+Soup I-DISH
+was O
+hearty O
+. O
+
+I O
+enjoyed O
+Salmon B-DISH
+Nigiri I-DISH
+last O
+week O
+. O
+
+They O
+ate O
+Dahi B-DISH
+Puri I-DISH
+at O
+the O
+fair O
+. O
+
+We O
+ordered O
+Shrimp B-DISH
+Wontons I-DISH
+for O
+the O
+party O
+. O
+
+The O
+Pancakes B-DISH
+were O
+fluffy O
+and O
+golden O
+. O
+
+I O
+tried O
+Tuna B-DISH
+Nigiri I-DISH
+for O
+dinner O
+. O
+
+She O
+loves O
+Mushroom B-DISH
+Pasta I-DISH
+with O
+truffle O
+oil O
+. O
+
+We O
+had O
+Tandoori B-DISH
+Shrimp I-DISH
+last O
+night O
+. O
+
+The O
+Fish B-DISH
+Cakes I-DISH
+were O
+crisp O
+. O
+
+He O
+tried O
+Tofu B-DISH
+Bulgogi I-DISH
+at O
+the O
+market O
+. O
+
+I O
+ordered O
+Nicoise B-DISH
+Salad I-DISH
+for O
+lunch O
+. O
+
+We O
+enjoyed O
+Chicken B-DISH
+Kebabs I-DISH
+yesterday O
+. O
+
+The O
+Pork B-DISH
+Bao I-DISH
+were O
+soft O
+and O
+juicy O
+. O
+
+She O
+ate O
+Malai B-DISH
+Kofta I-DISH
+for O
+dinner O
+. O
+
+We O
+had O
+Lobster B-DISH
+Tacos I-DISH
+at O
+the O
+beach O
+. O
+
+The O
+Red B-DISH
+Curry I-DISH
+was O
+spicy O
+. O
+
+I O
+tried O
+Mango B-DISH
+Pudding I-DISH
+for O
+dessert O
+. O
+
+They O
+ordered O
+Vegetable B-DISH
+Quesadillas I-DISH
+for O
+lunch O
+. O
+
+We O
+ate O
+Beef B-DISH
+Piccata I-DISH
+last O
+week O
+. O
+
+The O
+Chicken B-DISH
+Noodle I-DISH
+Soup I-DISH
+was O
+savory O
+. O
+
+I O
+enjoyed O
+Shrimp B-DISH
+Ceviche I-DISH
+by O
+the O
+coast O
+. O
+
+She O
+ordered O
+Beef B-DISH
+Bibimbap I-DISH
+for O
+dinner O
+. O
+
+We O
+had O
+Stuffed B-DISH
+Tomatoes I-DISH
+as O
+an O
+appetizer O
+. O
+
+The O
+Vegetable B-DISH
+Pakoras I-DISH
+were O
+crispy O
+. O
+
+I O
+tried O
+Chicken B-DISH
+Tamales I-DISH
+at O
+the O
+festival O
+. O
+
+They O
+enjoyed O
+Mushroom B-DISH
+Risotto I-DISH
+last O
+night O
+. O
+
+We O
+ordered O
+Garlic B-DISH
+Masala I-DISH
+Naan I-DISH
+with O
+curry O
+. O
+
+The O
+Lobster B-DISH
+Ravioli I-DISH
+was O
+savory O
+. O
+
+I O
+ate O
+Beef B-DISH
+Katsu I-DISH
+for O
+lunch O
+. O
+
+She O
+tried O
+Rose B-DISH
+Lassi I-DISH
+as O
+a O
+drink O
+. O
+
+We O
+had O
+Pork B-DISH
+Empanadas I-DISH
+at O
+the O
+market O
+. O
+
+The O
+Veggie B-DISH
+Pizza I-DISH
+was O
+fresh O
+and O
+light O
+. O
+
+I O
+ordered O
+Tofu B-DISH
+Banh I-DISH
+Mi I-DISH
+for O
+lunch O
+. O
+
+They O
+enjoyed O
+Butter B-DISH
+Naan I-DISH
+with O
+paneer O
+. O
+
+We O
+ate O
+Chicken B-DISH
+Pad I-DISH
+Thai I-DISH
+last O
+night O
+. O
+
+The O
+Mushroom B-DISH
+Soup I-DISH
+was O
+creamy O
+. O
+
+I O
+tried O
+Crab B-DISH
+Tempura I-DISH
+for O
+dinner O
+. O
+
+She O
+ordered O
+Churro B-DISH
+for O
+dessert O
+. O
+
+We O
+had O
+Chicken B-DISH
+Skewers I-DISH
+as O
+an O
+appetizer O
+. O
+
+The O
+Tomato B-DISH
+Soup I-DISH
+was O
+hearty O
+. O
+
+I O
+enjoyed O
+Shrimp B-DISH
+Nigiri I-DISH
+last O
+week O
+. O
+
+They O
+ate O
+Vada B-DISH
+Pav I-DISH
+at O
+the O
+fair O
+. O
+
+We O
+ordered O
+Beef B-DISH
+Wontons I-DISH
+for O
+the O
+party O
+. O
+
+The O
+Crepes B-DISH
+Suzette I-DISH
+were O
+sweet O
+. O
+
+I O
+tried O
+Octopus B-DISH
+Sashimi I-DISH
+for O
+dinner O
+. O
+
+She O
+loves O
+Carbonara B-DISH
+Pasta I-DISH
+with O
+bacon O
+. O
+
+We O
+had O
+Tandoori B-DISH
+Chicken I-DISH
+Wings I-DISH
+last O
+night O
+. O
+
+The O
+Shrimp B-DISH
+Cakes I-DISH
+were O
+crisp O
+. O
+
+He O
+tried O
+Vegetable B-DISH
+Bulgogi I-DISH
+at O
+the O
+market O
+. O
+
+I O
+ordered O
+Greek B-DISH
+Salad I-DISH
+for O
+lunch O
+. O
+
+We O
+enjoyed O
+Lamb B-DISH
+Shawarma I-DISH
+yesterday O
+. O
+
+The O
+Chicken B-DISH
+Bao I-DISH
+were O
+soft O
+and O
+juicy O
+. O
+
+She O
+ate O
+Saag B-DISH
+Aloo I-DISH
+for O
+dinner O
+. O
+
+We O
+had O
+Fish B-DISH
+Tacos I-DISH
+at O
+the O
+beach O
+. O
+
+The O
+Yellow B-DISH
+Curry I-DISH
+was O
+spicy O
+. O
+
+I O
+tried O
+Coconut B-DISH
+Pudding I-DISH
+for O
+dessert O
+. O
+
+They O
+ordered O
+Shrimp B-DISH
+Quesadillas I-DISH
+for O
+lunch O
+. O
+
+We O
+ate O
+Veal B-DISH
+Piccata I-DISH
+last O
+week O
+. O
+
+The O
+Beef B-DISH
+Noodle I-DISH
+Soup I-DISH
+was O
+savory O
+. O
+
+I O
+enjoyed O
+Tuna B-DISH
+Ceviche I-DISH
+by O
+the O
+coast O
+. O
+
+She O
+ordered O
+Chicken B-DISH
+Bibimbap I-DISH
+for O
+dinner O
+. O
+
+We O
+had O
+Stuffed B-DISH
+Peppers I-DISH
+as O
+an O
+appetizer O
+. O
+
+The O
+Lentil B-DISH
+Samosas I-DISH
+were O
+crispy O
+. O
+
+I O
+tried O
+Pork B-DISH
+Chili I-DISH
+Verde I-DISH
+at O
+the O
+festival O
+. O
+
+They O
+enjoyed O
+Clam B-DISH
+Risotto I-DISH
+last O
+night O
+. O
+
+We O
+ordered O
+Tandoori B-DISH
+Naan I-DISH
+with O
+curry O
+. O
+
+The O
+Spinach B-DISH
+Ravioli I-DISH
+was O
+savory O
+. O
+
+I O
+ate O
+Chicken B-DISH
+Katsu I-DISH
+Curry I-DISH
+for O
+lunch O
+. O
+
+She O
+tried O
+Mango B-DISH
+Lassi I-DISH
+as O
+a O
+drink O
+. O
+
+We O
+had O
+Beef B-DISH
+Empanadas I-DISH
+at O
+the O
+market O
+. O
+
+The O
+Margherita B-DISH
+Pizza I-DISH
+was O
+fresh O
+and O
+light O
+. O
+
+I O
+ordered O
+Pork B-DISH
+Banh I-DISH
+Mi I-DISH
+for O
+lunch O
+. O
+
+They O
+enjoyed O
+Garlic B-DISH
+Naan I-DISH
+with O
+paneer O
+. O
+
+We O
+ate O
+Shrimp B-DISH
+Pad I-DISH
+Thai I-DISH
+last O
+night O
+. O
+
+The O
+Crab B-DISH
+Bisque I-DISH
+was O
+creamy O
+. O
+
+I O
+tried O
+Vegetable B-DISH
+Tempura I-DISH
+for O
+dinner O
+. O
+
+She O
+ordered O
+Flan B-DISH
+for O
+dessert O
+. O
+
+We O
+had O
+Chicken B-DISH
+Satay I-DISH
+as O
+an O
+appetizer O
+. O
+
+The O
+Lentil B-DISH
+Soup I-DISH
+was O
+hearty O
+. O
+
+I O
+enjoyed O
+Tuna B-DISH
+Sushi I-DISH
+last O
+week O
+. O
+
+They O
+ate O
+Pani B-DISH
+Puri I-DISH
+at O
+the O
+fair O
+. O
+
+We O
+ordered O
+Pork B-DISH
+Wontons I-DISH
+for O
+the O
+party O
+. O
+
+The O
+Waffles B-DISH
+were O
+golden O
+and O
+crisp O
+. O
+
+I O
+tried O
+Salmon B-DISH
+Sashimi I-DISH
+for O
+dinner O
+. O
+
+She O
+loves O
+Pesto B-DISH
+Pasta I-DISH
+with O
+shrimp O
+. O
+
+We O
+had O
+Tandoori B-DISH
+Prawns I-DISH
+last O
+night O
+. O
+
+The O
+Crab B-DISH
+Cakes I-DISH
+were O
+crisp O
+. O
+
+He O
+tried O
+Beef B-DISH
+Bulgogi I-DISH
+at O
+the O
+market O
+. O
+
+I O
+ordered O
+Caesar B-DISH
+Salad I-DISH
+for O
+lunch O
+. O
+
+We O
+enjoyed O
+Chicken B-DISH
+Shawarma I-DISH
+yesterday O
+. O
+
+The O
+Steamed B-DISH
+Buns I-DISH
+were O
+soft O
+and O
+flavorful O
+. O
+
+She O
+ate O
+Rogan B-DISH
+Josh I-DISH
+for O
+dinner O
+. O
+
+We O
+had O
+Fish B-DISH
+Tacos I-DISH
+at O
+the O
+beach O
+. O
+
+The O
+Pad B-DISH
+See I-DISH
+Ew I-DISH
+was O
+spicy O
+. O
+
+I O
+tried O
+Mango B-DISH
+Sticky I-DISH
+Rice I-DISH
+for O
+dessert O
+. O
+
+They O
+ordered O
+Cheese B-DISH
+Quesadillas I-DISH
+for O
+lunch O
+. O
+
+We O
+ate O
+Chicken B-DISH
+Parmesan I-DISH
+last O
+week O
+. O
+
+The O
+Tom B-DISH
+Yum I-DISH
+Soup I-DISH
+was O
+tangy O
+. O
+
+I O
+enjoyed O
+Shrimp B-DISH
+Ceviche I-DISH
+by O
+the O
+coast O
+. O
+
+She O
+ordered O
+Dolsot B-DISH
+Bibimbap I-DISH
+for O
+dinner O
+. O
+
+We O
+had O
+Stuffed B-DISH
+Mushrooms I-DISH
+as O
+an O
+appetizer O
+. O
+
+The O
+Vegetable B-DISH
+Samosas I-DISH
+were O
+crispy O
+. O
+
+I O
+tried O
+Chili B-DISH
+Rellenos I-DISH
+at O
+the O
+festival O
+. O
+
+They O
+enjoyed O
+Lobster B-DISH
+Risotto I-DISH
+last O
+night O
+. O
+
+We O
+ordered O
+Garlic B-DISH
+Naan I-DISH
+with O
+curry O
+. O
+
+The O
+Spinach B-DISH
+Ravioli I-DISH
+was O
+savory O
+. O
+
+I O
+ate O
+Tofu B-DISH
+Katsu I-DISH
+for O
+lunch O
+. O
