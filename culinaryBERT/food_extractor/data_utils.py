@@ -1,25 +1,34 @@
 import json
-from typing import List
+from typing import Dict, List
 
 import torch
+from torch.utils.data import Dataset
+import transformers
 from transformers import DistilBertTokenizerFast
+import random
 
-UNIQUE_TAGS = ["B-DISH", "I-DISH", "O"]
-tag2id = {tag: id for id, tag in enumerate(UNIQUE_TAGS)}
-tag2id_no_prod = dict(zip(UNIQUE_TAGS, [0, 1, 2]))
+# BIO Tags
+UNIQUE_TAGS = ["B-DISH", "I-DISH", "O", 'B-RESTAURANT', 'I-RESTAURANT']
+tag2id = dict(zip(UNIQUE_TAGS, [0, 1, 2, 3, 4]))
 id2tag = {id: tag for tag, id in tag2id.items()}
-id2tag_no_prod = {id: tag for tag, id in tag2id_no_prod.items()}
 
-def get_tokenizer():
-    tokenizer = DistilBertTokenizerFast.from_pretrained(
-        "distilbert-base-cased", do_lower_case=False
-    )
-    return tokenizer
+# Instantiate tokenizer
+# NOTE: Will tokenize to lowercase 
+bert_tokenizer = tokenizer = DistilBertTokenizerFast.from_pretrained('distilbert-base-uncased', do_lower_case=True)
 
+# def get_tokenizer():
+#     tokenizer = DistilBertTokenizerFast.from_pretrained(
+#         "distilbert-base-cased", do_lower_case=False
+#     )
+#     return tokenizer
 
 def flatten(l: List[list]) -> list:
+    """
+        Takes a list containing sublists and combines them together by
+        'flattening' all of the lists into one single list
+    """
+    # (X) for y in l for X in y
     return [item for sublist in l for item in sublist]
-
 
 def pad_list(labels: list, encodings_len: int) -> list:
     """Takes an individual tag list and pads it to match the length of 
@@ -31,11 +40,9 @@ def pad_list(labels: list, encodings_len: int) -> list:
         return padded
     return labels
 
-
 def encode_tags(tags: List[str], encodings_len: int, tag2id: dict):
     labels = [pad_list([tag2id[tag] for tag in doc], encodings_len) for doc in tags]
     return labels
-
 
 def get_words_and_labels(docs: list):
     words, labels = [], []
@@ -44,85 +51,106 @@ def get_words_and_labels(docs: list):
             continue
         doc = doc.strip()
         lines = doc.split("\n")
-        words.append([line.split()[0] for line in lines])
-        labels.append([line.split()[-1] for line in lines])
+        doc_words, doc_labels = [], []
+        for line in lines:
+            parts = line.split()
+            if len(parts) < 2:
+                continue  # Skip malformed lines
+            doc_words.append(parts[0]) # Should treat all words as lower
+            doc_labels.append(parts[-1])
+        words.append(doc_words)
+        labels.append(doc_labels)
     return words, labels
 
+# Unsure for use case
+# def detokenize(tokenizer: DistilBertTokenizerFast, words_list: List[list]):
+#     detokenized = []
+#     for words in words_list:
+#         try:
+#             token_ids = [tokenizer.convert_tokens_to_ids(word) for word in words if word in tokenizer.vocab]
+#             detokenized.append(tokenizer.decode(token_ids))
+#         except Exception as e:
+#             print(f"Error detokenizing {words}: {e}")
+#             detokenized.append("")
+#     return detokenized
 
-def detokenize(tokenizer: DistilBertTokenizerFast, words_list: List[list]):
-    detokenized = [
-        tokenizer.decode(tokenizer.convert_tokens_to_ids(words)) for words in words_list
-    ]
-    return detokenized
 
+def preprocess_bio_data(data, prop_train=0.8, max_length=128):
+    tokenizer = DistilBertTokenizerFast.from_pretrained("distilbert-base-cased")
+    label_to_id = {"B-DISH": 0, "I-DISH": 1, "O": 2, "B-RESTAURANT": 3, "I-RESTAURANT": 4}
 
-def preprocess_bio_data(
-    bio_formatted_data: str, prop_train: float = 0.8, no_product_labels: bool = False
-):
+    # Parse BIO format (e.g., "I O\nate O\npizza B-DISH\n\n")
+    sentences = []
+    current_sentence = []
+    current_labels = []
+    for line in data.splitlines():
+        if line.strip():
+            # print('Line: ', line)
+            token, label = line.split()
+            current_sentence.append(token)
+            current_labels.append(label)
+        else:
+            if current_sentence:
+                sentences.append((current_sentence, current_labels))
+                current_sentence = []
+                current_labels = []
+    if current_sentence:
+        sentences.append((current_sentence, current_labels))
 
-    """
-    Takes pretokenized CONLL-formatted data, preprocesses it into training
-    data for `transformers` model DistilBERT.
-    """
+    encodings = []
+    labels = []
+    for tokens, token_labels in sentences:
+        # Tokenize with pre-tokenized input
+        tokenized = tokenizer(
+            tokens,
+            is_split_into_words=True,
+            truncation=True,
+            padding='max_length',
+            max_length=max_length,
+            return_offsets_mapping=True
+        )
 
-    tag2id_dict = tag2id if no_product_labels == False else tag2id_no_prod
-    tokenizer = get_tokenizer()
-    docs = bio_formatted_data.split("\n\n")
-    n_train_docs = int(len(docs) * prop_train)
-    train_docs, val_docs = docs[:n_train_docs], docs[n_train_docs:]
+        # Align labels with subword tokens
+        aligned_labels = []
+        word_ids = tokenized.word_ids()
+        for i, word_id in enumerate(word_ids):
+            if word_id is None:  # Special tokens ([CLS], [SEP])
+                aligned_labels.append(-100)
+            else:
+                aligned_labels.append(label_to_id[token_labels[word_id]])
 
-    train_words, train_labels = get_words_and_labels(train_docs)
-    val_words, val_labels = get_words_and_labels(val_docs)
-    train_seqs, val_seqs = (
-        detokenize(tokenizer, train_words),
-        detokenize(tokenizer, val_words),
-    )
+        encodings.append({
+            'input_ids': tokenized['input_ids'],
+            'attention_mask': tokenized['attention_mask']
+        })
+        labels.append(aligned_labels)
 
-    train_word_encodings = tokenizer(
-        train_seqs,
-        is_pretokenized=False,
-        padding=True,
-        truncation=True,
-        add_special_tokens=False,
-    )
-    train_label_encodings = encode_tags(
-        train_labels, len(train_word_encodings["input_ids"][0]), tag2id_dict
-    )
+    # Split into train and validation
+    random.seed(42)  # For reproducibility
+    random.shuffle(sentences)
+    split_idx = int(len(sentences) * prop_train)
+    train_encodings = encodings[:split_idx]
+    val_encodings = encodings[split_idx:]
+    train_labels = labels[:split_idx]
+    val_labels = labels[split_idx:]
 
-    val_word_encodings = tokenizer(
-        val_seqs,
-        is_pretokenized=False,
-        padding=True,
-        truncation=True,
-        add_special_tokens=False,
-    )
-    val_label_encodings = encode_tags(
-        val_labels, len(val_word_encodings["input_ids"][0]), tag2id_dict
-    )
-
-    return (
-        train_word_encodings,
-        train_label_encodings,
-        val_word_encodings,
-        val_label_encodings,
-    )
+    return train_encodings, train_labels, val_encodings, val_labels
 
 
 def ls_spans_to_bio(ls_data_path: str, save_path: str):
-
-    """
-    Standalone function to convert LabelStudio span-formatted data to BIO labels.
-    """
-
     with open(ls_data_path) as f:
         examples = json.load(f)
-
-    tokenizer = get_tokenizer()
-    seqs = [example["data"]["text"] for example in examples]
-    labels = [example["completions"][0]["result"] for example in examples]
+    tokenizer = bert_tokenizer
+    seqs, labels = [], []
+    for example in examples:
+        try:
+            seqs.append(example["data"]["text"])
+            labels.append(example["completions"][0]["result"])
+        except (KeyError, IndexError):
+            print(f"Skipping invalid example: {example}")
+            continue
     encodings = tokenizer(
         seqs,
-        is_pretokenized=False,
         return_offsets_mapping=True,
         padding=False,
         truncation=True,
@@ -130,56 +158,71 @@ def ls_spans_to_bio(ls_data_path: str, save_path: str):
     )
     bio_labels = _spans_to_bio(labels, encodings)
     tokens = [enc.tokens for enc in encodings.encodings]
-
     with open(save_path, "w") as f:
         for toks, labs in zip(tokens, bio_labels):
             lines = [f"{t}\t{l}" for t, l in zip(toks, labs)]
             entry = "\n".join(lines)
             f.write(entry + "\n\n")
-
     return tokens, bio_labels
 
 
 def _spans_to_bio(labels: List[List[dict]], encodings):
-
-    """Inner function used by `ls_spans_to_bio`."""
-
     bio_labels = []
-
     for enc, label_set in zip(encodings.encodings, labels):
         tok_starts = [tup[0] for tup in enc.offsets]
         tok_ends = [tup[1] for tup in enc.offsets]
         token_labels = ["O"] * len(enc)
-
         for label in label_set:
             entry = label["value"]
             start, end, ent_type = entry["start"], entry["end"], entry["labels"][0]
-            start_token = tok_starts.index(start)
-            end_token = tok_ends.index(end) + 1
-
-            # convert to bio format
-            if start_token == end_token + 1:
-                # Single token is tagged; just throw a B on it
-                token_labels[start_token] = f"B-{ent_type}"
-            else:
-                n_tokens = end_token - start_token
-                token_labels[start_token:end_token] = [f"I-{ent_type}"] * n_tokens
-                token_labels[start_token] = f"B-{ent_type}"
-
+            if ent_type != "DISH" and ent_type != 'RESTAURANT':
+                continue  # Skip on proc on dish and restaurant entities
+            try:
+                start_token = tok_starts.index(start)
+                end_token = tok_ends.index(end) + 1
+                if start_token == end_token + 1:
+                    token_labels[start_token] = f"B-{ent_type}"
+                else:
+                    n_tokens = end_token - start_token
+                    token_labels[start_token:end_token] = [f"I-{ent_type}"] * n_tokens
+                    token_labels[start_token] = f"B-{ent_type}"
+            except ValueError:
+                print(f"Skipping invalid span: {start}-{end}")
+                continue
         bio_labels.append(token_labels)
-
     return bio_labels
 
 
-class TokenClassificationDataset(torch.utils.data.Dataset):
-    def __init__(self, encodings, labels):
-        self.encodings = encodings
-        self.labels = labels
-        self.unique_tags = UNIQUE_TAGS
+class TokenClassificationDataset(Dataset):
+    def __init__(self, encodings, labels, max_length=128):
+        self.encodings = encodings  # List of dicts: [{'input_ids': [...], 'attention_mask': [...]}, ...]
+        self.labels = labels  # List of label lists: [[0, 1, 2, -100, ...], ...]
+        self.max_length = max_length
+        self.unique_tags = ["B-DISH", "I-DISH", "O", "B-RESTAURANT", "I-RESTAURANT"]  # Set in train function
 
     def __getitem__(self, idx):
-        item = {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
-        item["labels"] = torch.tensor(self.labels[idx])
+        # Get the encoding dictionary for this sample
+        encoding = self.encodings[idx]
+        labels = self.labels[idx]
+
+        # Convert to tensors
+        item = {key: torch.tensor(val) for key, val in encoding.items()}
+        item['labels'] = torch.tensor(labels)
+
+        # Verify and pad to max_length
+        seq_length = item['input_ids'].size(0)
+        if seq_length != self.max_length:
+            print(f"Warning: Sample {idx} has length {seq_length}, padding to {self.max_length}")
+            padding_length = self.max_length - seq_length
+            item['input_ids'] = torch.nn.functional.pad(item['input_ids'], (0, padding_length), value=0)
+            item['attention_mask'] = torch.nn.functional.pad(item['attention_mask'], (0, padding_length), value=0)
+            item['labels'] = torch.nn.functional.pad(item['labels'], (0, padding_length), value=-100)
+
+        # Verify shapes
+        assert item['input_ids'].size(0) == self.max_length, f"input_ids shape: {item['input_ids'].size(0)}"
+        assert item['attention_mask'].size(0) == self.max_length, f"attention_mask shape: {item['attention_mask'].size(0)}"
+        assert item['labels'].size(0) == self.max_length, f"labels shape: {item['labels'].size(0)}"
+
         return item
 
     def __len__(self):

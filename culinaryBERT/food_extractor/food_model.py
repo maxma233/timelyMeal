@@ -8,7 +8,9 @@ from transformers import (
     DistilBertTokenizerFast,
 )
 
-from food_extractor.data_utils import id2tag, id2tag_no_prod, flatten
+# import food_extractor
+# from food_extractor.data_utils import id2tag, id2tag_no_prod, flatten
+from data_utils import id2tag_no_prod, flatten
 
 # HF_MODEL_PATH = "chambliss/distilbert-for-food-extraction"
 HF_MODEL_PATH = 'distilbert/distilbert-base-uncased'
