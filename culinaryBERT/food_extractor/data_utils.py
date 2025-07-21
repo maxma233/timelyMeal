@@ -14,7 +14,7 @@ id2tag = {id: tag for tag, id in tag2id.items()}
 
 # Instantiate tokenizer
 # NOTE: Will tokenize to lowercase 
-bert_tokenizer = tokenizer = DistilBertTokenizerFast.from_pretrained('distilbert-base-uncased', do_lower_case=True)
+bert_tokenizer = DistilBertTokenizerFast.from_pretrained('distilbert-base-uncased', do_lower_case=True)
 
 # def get_tokenizer():
 #     tokenizer = DistilBertTokenizerFast.from_pretrained(
@@ -31,8 +31,10 @@ def flatten(l: List[list]) -> list:
     return [item for sublist in l for item in sublist]
 
 def pad_list(labels: list, encodings_len: int) -> list:
-    """Takes an individual tag list and pads it to match the length of 
-    the token encodings."""
+    """
+        Takes an individual tag list and pads it to match the length of 
+        the token encodings.
+    """
     label_len = len(labels)
     if label_len < encodings_len:
         n_paddings = encodings_len - label_len
@@ -56,7 +58,7 @@ def get_words_and_labels(docs: list):
             parts = line.split()
             if len(parts) < 2:
                 continue  # Skip malformed lines
-            doc_words.append(parts[0]) # Should treat all words as lower
+            doc_words.append(parts[0])
             doc_labels.append(parts[-1])
         words.append(doc_words)
         labels.append(doc_labels)
@@ -76,31 +78,46 @@ def get_words_and_labels(docs: list):
 
 
 def preprocess_bio_data(data, prop_train=0.8, max_length=128):
-    tokenizer = DistilBertTokenizerFast.from_pretrained("distilbert-base-cased")
+    """
+        
+        Args:
+        data (str):
+    
+    """
+
+    # tokenizer = DistilBertTokenizerFast.from_pretrained("distilbert-base-cased")
+    tokenizer = bert_tokenizer
     label_to_id = {"B-DISH": 0, "I-DISH": 1, "O": 2, "B-RESTAURANT": 3, "I-RESTAURANT": 4}
 
     # Parse BIO format (e.g., "I O\nate O\npizza B-DISH\n\n")
     sentences = []
     current_sentence = []
     current_labels = []
+
+    # Purpose: Corral all sentences into a list by tupling with their labels
     for line in data.splitlines():
-        if line.strip():
-            # print('Line: ', line)
-            token, label = line.split()
+        data_line = line.strip()
+        if data_line:
+            # Ex: pizza, B-DISH
+            token, label = data_line.split()
             current_sentence.append(token)
             current_labels.append(label)
         else:
+            # The sentence is complete, '\n' reached
             if current_sentence:
+                # Add the sentence and labels (['I', 'ate', 'pizza'], ['O', 'O', 'B-DISH'])
                 sentences.append((current_sentence, current_labels))
+                # Reset for new sentence
                 current_sentence = []
                 current_labels = []
     if current_sentence:
+        # Add final sentence if did not terminate with a '\n'
         sentences.append((current_sentence, current_labels))
 
     encodings = []
     labels = []
     for tokens, token_labels in sentences:
-        # Tokenize with pre-tokenized input
+        # Tokenize the sentence (tokens)
         tokenized = tokenizer(
             tokens,
             is_split_into_words=True,
@@ -113,12 +130,18 @@ def preprocess_bio_data(data, prop_train=0.8, max_length=128):
         # Align labels with subword tokens
         aligned_labels = []
         word_ids = tokenized.word_ids()
+
+        # print(word_ids)
+
         for i, word_id in enumerate(word_ids):
-            if word_id is None:  # Special tokens ([CLS], [SEP])
+            if word_id is None:  # Special tokens ([CLS], [SEP], [PAD], [MSK], [UNK])
                 aligned_labels.append(-100)
             else:
+                # Getting the label that correlates to the word id and then 
+                # translating that to the text version of the label
                 aligned_labels.append(label_to_id[token_labels[word_id]])
 
+        # These will be both reflect each other [0] in one list correlates to [0] in the other
         encodings.append({
             'input_ids': tokenized['input_ids'],
             'attention_mask': tokenized['attention_mask']
@@ -126,15 +149,40 @@ def preprocess_bio_data(data, prop_train=0.8, max_length=128):
         labels.append(aligned_labels)
 
     # Split into train and validation
-    random.seed(42)  # For reproducibility
-    random.shuffle(sentences)
+    # NOTE: Need to create some transparency for this step to pass to the eval file builder
+    
+    # Gets a list containing the indices from 0 up to the length of
+    # the sentences list - 1 AKA the end 
+    list_index_vals = list(range(len(sentences)))
+
+    # Shuffle all the lists
+    # Approach: get the indexes from the sentences list and shuffle them
+    # then, apply those changes to each list
+    # Ex: [0, 1, 2] => [2, 0, 1]
+
+
+    random.seed(random.randint(0,100))  # For reproducibility
+    random.shuffle(list_index_vals)
+
+    # Shuffle all of the lists
+    # Now with the list_index_vals, it will pull the value correlating
+    # at the shuffled index (i) by building a new list
+    sentences = [sentences[i] for i in list_index_vals]
+    encodings = [encodings[i] for i in list_index_vals]
+    labels = [labels[i] for i in list_index_vals]
+
+    # Split it up
     split_idx = int(len(sentences) * prop_train)
     train_encodings = encodings[:split_idx]
     val_encodings = encodings[split_idx:]
     train_labels = labels[:split_idx]
     val_labels = labels[split_idx:]
+    
+    train_sentences = sentences[:split_idx]
+    test_sentences = sentences[split_idx:]
+    # print("Test Sentences: ", test_sentences)
 
-    return train_encodings, train_labels, val_encodings, val_labels
+    return train_encodings, train_labels, val_encodings, val_labels, train_sentences, test_sentences
 
 
 def ls_spans_to_bio(ls_data_path: str, save_path: str):
