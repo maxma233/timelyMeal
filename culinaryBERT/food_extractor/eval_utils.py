@@ -2,6 +2,7 @@ from collections import Counter
 import json
 import logging
 import os
+import traceback
 from typing import List
 
 import pandas as pd
@@ -10,6 +11,28 @@ import pandas as pd
 from food_model import FoodModel
 
 logger = logging.getLogger("errors")
+
+def build_conll_file(file_location_path: str, sentence_list: List[list[str]], label_list: List[list[str]]):
+    """
+        Builds a file following conll format.
+        NOTE: Takes in params sentences and labels when they could
+            already be zipped up (pretty redundant)
+        NOTE: The above statement is somewhat not true.
+        Args:
+    """
+
+    if (len(sentence_list) != len(label_list)):
+        print("Testing data provided is incorrectly formatted!")
+        raise ValueError
+    
+    # Unpack the list of lists and write each tuple onto a line
+    with open(file=file_location_path, mode='w') as file:
+        for sentences, labels in zip(sentence_list, label_list):
+            for sentence, label in zip(sentences, labels):
+                new_line = f'{sentence} {label}\n'
+                file.write(new_line)
+            file.write('\n')
+
 
 def is_between(x, y, z):
     """Calculates whether x is between y and z."""
@@ -94,7 +117,9 @@ def judge_tags(tag: str, model_labels: dict, true_labels: dict, text: str):
     Judges the model's tags against the annotator-labeled tags for a single doc,
     specifically for the DISH tag.
     """
-    if tag != "DISH":
+    valid_label_tags = ['DISH', 'RESTAURANT']
+
+    if tag not in valid_label_tags:
         raise ValueError("This method only supports the DISH tag")
 
     label_classes = []
@@ -144,7 +169,7 @@ def judge_perf(perf_dict: dict):
     return perf_df.round(3)
 
 
-def reformat_true_labels(completions: list) -> dict:
+def reformat_true_labels(completions: list, no_product_labels: bool) -> dict:
     reformatted = {"DISH": [], "RESTAURANT": []}
     try:
         labels = completions[0]["result"]
@@ -165,6 +190,7 @@ def reformat_true_labels(completions: list) -> dict:
 
 
 def reformat_model_labels(entities: dict, no_product_labels: bool = False) -> dict:
+    
     reformatted = {"DISH": [], "RESTAURANT": []}
     for ent_type in entities:
         if ent_type != "RESTAURANT" and ent_type != "DISH":
@@ -184,11 +210,18 @@ def reformat_model_labels(entities: dict, no_product_labels: bool = False) -> di
 def evaluate_model(
     model_path: str, eval_file_path: str, no_product_labels: bool = False
 ):
+
+    # Build path location for based upon the model name (technically path)
     model_dir = model_path.split("/")[-1]
+
+    # print('Model Path: ', model_path)
+    # print('Model Directory: ', model_dir)
+
     performance_dir = "../data/performance"
     eval_destination = os.path.join(performance_dir, model_dir)
     os.makedirs(eval_destination, exist_ok=True)
     try:
+        # Load up all the json objects representing each case
         with open(eval_file_path) as f:
             examples = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError) as e:
@@ -201,23 +234,34 @@ def evaluate_model(
     )
     logger.setLevel("INFO")
     try:
+        # Load up the model
         model = FoodModel(model_path, no_product_labels=no_product_labels)
     except Exception as e:
         logger.error(f"Failed to load model {model_path}: {e}")
         return
     tags = ["DISH", "RESTAURANT"]
     perf_dict = {"DISH": Counter(), "RESTAURANT": Counter()}
+
+    # print('Examples: ', examples)
+
     for example in examples:
         try:
+            # Grabs sentence reflecting the example
             text = example["data"]["text"]
             logger.info(f"TEXT: {text}")
+            # NO LONGER USES no_product_labels
             true_labels = reformat_true_labels(example["completions"], no_product_labels)
             model_labels = reformat_model_labels(model.extract_foods(text)[0], no_product_labels)
+
             for tag in tags:
                 perf_dict[tag] += judge_tags(tag, model_labels, true_labels, text)
             logger.info("")
         except Exception as e:
             logger.error(f"Error processing example: {e}")
+        
+            # Add stack trace
+            # traceback.print_exception(e)
+
             continue
     perf_df = pd.DataFrame(judge_perf(perf_dict))
     perf_df.to_csv(os.path.join(eval_destination, "eval_PRF1.csv"))
