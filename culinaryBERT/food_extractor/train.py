@@ -1,20 +1,19 @@
 import torch
-from transformers import DistilBertForTokenClassification, TrainingArguments, Trainer
+from transformers import DistilBertForTokenClassification, TrainingArguments, Trainer, pipeline
+from data_utils import preprocess_bio_data, TokenClassificationDataset
+from eval_utils import evaluate_model, build_conll_file
 
-from food_extractor.data_utils import preprocess_bio_data, TokenClassificationDataset
-from food_extractor.eval_utils import evaluate_model
-
+from eval_file_builder import EvalFileBuilder
 
 def train(
     train_data_path: str,
     model_save_path: str,
     prop_train: float = 0.8,
-    no_product_labels: bool = False,
+    no_product_labels: bool = True,  # Align with judge_tags
     seed: int = 9,
     evaluate_after_training: bool = True,
     eval_file_path: str = "../data/eval/eval_labeled.json",
 ):
-
     """
     train_data_path: The path to your training data. Will be split 
     model_save_path: The path to where your model should be saved.
@@ -29,37 +28,43 @@ def train(
     LabelStudio-formatted JSON to work correctly. (See format of included 
     eval file.)
     """
-
     DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
     with open(train_data_path) as f:
         data = f.read()
 
-    train_encodings, train_labels, val_encodings, val_labels = preprocess_bio_data(
-        data, prop_train=prop_train, no_product_labels=no_product_labels
+    max_length = 128  # Ensure consistent sequence length
+    train_encodings, train_labels, val_encodings, val_labels, train_sentences, test_sentences = preprocess_bio_data(
+        data, prop_train=prop_train
     )
-    train_dataset = TokenClassificationDataset(train_encodings, train_labels)
-    val_dataset = TokenClassificationDataset(val_encodings, val_labels)
+
+    train_dataset = TokenClassificationDataset(train_encodings, train_labels, max_length=max_length)
+    val_dataset = TokenClassificationDataset(val_encodings, val_labels, max_length=max_length)
 
     if no_product_labels:
         train_dataset.unique_tags = ["B-DISH", "I-DISH", "O"]
         val_dataset.unique_tags = ["B-DISH", "I-DISH", "O"]
 
+    # print()
+
     model = DistilBertForTokenClassification.from_pretrained(
         "distilbert-base-cased", num_labels=len(train_dataset.unique_tags)
     )
+
+    model.config.id2label = {0: "B-DISH", 1: "I-DISH", 2: "O"}
+    model.config.label2id = {"B-DISH": 0, "I-DISH": 1, "O": 2}  
     model.to(DEVICE)
+    # model.train()
 
     training_args = TrainingArguments(
         output_dir=model_save_path,
-        num_train_epochs=7,  # total number of training epochs
-        per_device_train_batch_size=32,  # batch size per device during training
-        per_device_eval_batch_size=16,  # batch size for evaluation
+        num_train_epochs=7,
+        per_device_train_batch_size=32,  # Reduced to debug
+        per_device_eval_batch_size=16,
         do_eval=True,
-        evaluate_during_training=True,
         eval_steps=10,
         warmup_steps=50,
-        weight_decay=0.01,  # strength of weight decay
+        weight_decay=0.01,
         overwrite_output_dir=True,
         seed=seed,
     )
@@ -71,10 +76,25 @@ def train(
         eval_dataset=val_dataset,
     )
 
-    trainer.train()
-    trainer.save_model(model_save_path)
+    # trainer.train()
+    # trainer.save_model(model_save_path)
 
-    # Runs evaluation and saves a bunch of stats
+    # Build the eval file
+    # sentences, labels = [], []
+    # for sentence, label in test_sentences:
+    #     sentences.append(sentence)
+    #     labels.append(label)
+
+    sentences = [sentence for sentence, label in test_sentences]
+    labels = [label for sentence, label in test_sentences]
+    # print('Sentences: ', sentences)
+    # print('Labels: ', labels)
+
+    # Build the evaluation file to reference
+    build_conll_file(file_location_path='../training/test.txt', sentence_list=sentences, label_list=labels)
+    eval_builder = EvalFileBuilder(data_file_path='../training/test.txt')
+    eval_builder.build_file()
+
     if evaluate_after_training:
         evaluate_model(
             model_save_path,
@@ -86,15 +106,14 @@ def train(
             f"../data/performance/{model_save_path.split('/')[-1]}."
         )
 
-
 if __name__ == "__main__":
-
-    train_data_path = "../data/train.txt"
+    train_data_path = "../training/unique_stuff.txt"
     model_save_path = "../models/culinaryBERT"
-    prop_train = 0.8
-    no_product_labels = False
+    prop_train = .8
+    no_product_labels = True  # Align with judge_tags
     seed = 9
     evaluate_after_training = True
+    eval_file_path: str = "../data/eval/eval_labeled.json"
 
     train(
         train_data_path=train_data_path,
@@ -104,3 +123,8 @@ if __name__ == "__main__":
         seed=seed,
         evaluate_after_training=evaluate_after_training,
     )
+
+    # nlp = pipeline("ner", model="../models/culinaryBERT", tokenizer="distilbert-base-cased")
+    # text = 'Chicken Alfredo '
+    # results = nlp(text)
+    # print('Predictions: ', results)
