@@ -22,17 +22,21 @@ CORS(app) # enable CORS to allow request from native react app
 # NOTE: Change structure later
 current_dir = Path(__file__).resolve().parent
 # Add the path correctly
-script_dir = current_dir.parent.parent / 'DiscreteClassifier'
+middleware_dir = current_dir.parent / 'middleware'
+classifier_dir = current_dir.parent.parent / 'DiscreteClassifier'
 culinaryBERT_filepath = '../../culinaryBERT/models/culinaryBERT'
-DEFAULT_FILE_LOCATION = script_dir / 'timelymealsdiscreteannotated.csv'
+DEFAULT_FILE_LOCATION = classifier_dir / 'timelymealsdiscreteannotated.csv'
 
-if script_dir.exists():
-    sys.path.append(str(script_dir))
-    print(f"Added to path:{script_dir}")
+if classifier_dir.exists() and middleware_dir.exists():
+    sys.path.append(str(classifier_dir))
+    print(f"Added to path:{classifier_dir}")
+    sys.path.append(str(middleware_dir))
+    print(f"Added to path:{middleware_dir}")
 else: 
-    print(f"Path does not exist. {script_dir}")
+    print(f"Classifier {classifier_dir} and middleware {middleware_dir} paths need to be checked.")
 
 from classifier import Classifier
+from parse_culinaryBERT import get_dishes
 
 # Initialize the classifier
 classifier = Classifier(file_location=DEFAULT_FILE_LOCATION)
@@ -85,7 +89,7 @@ login(token=secret_token)
 #         model = None
 
 # Setting up pipeline
-gemma_pipe = pipeline("text-generation", model="timely/TimelyAI", device="cpu", torch_dtype=torch.bfloat16)
+# gemma_pipe = pipeline("text-generation", model="timely/TimelyAI", device="cpu", torch_dtype=torch.bfloat16)
  
 culinaryBERT_pipe = pipeline("ner", model=culinaryBERT_model, tokenizer=culinaryBERT_tokenizer, device="cpu")
 
@@ -185,11 +189,11 @@ def prompt_model():
     # print(f'Start time: {t.perf_counter() - start_time} seconds')
     
     # Call the model
-    output = gemma_pipe(text_inputs=base_messages, max_new_tokens=750)
+    # output = gemma_pipe(text_inputs=base_messages, max_new_tokens=750)
     
-    model_response = output[0]["generated_text"][-1]["content"]
+    # model_response = output[0]["generated_text"][-1]["content"]
 
-    print(model_response)
+    # print(model_response)
 
     return jsonify({"Message": model_response}), 200
     # return jsonify({"Message": 'good job'}), 200
@@ -206,10 +210,12 @@ def prompt_culinaryBERT():
         Used for dish and restaurant (in progress) classification.
     """
 
+    print('Request received!')
+
     # Grab the data
     data = request.get_json()
 
-    if (request.method() != 'POST'):
+    if (request.method != 'POST'):
         return jsonify({"Error": "Invalid method request type"}), 400
     
     text = data['text'] if 'text' in data else ''
@@ -220,11 +226,13 @@ def prompt_culinaryBERT():
     # Send the text to culinaryBERT
     results = culinaryBERT_pipe(text)
 
-    # Process the results
-    print(results)
+    dishes = get_dishes(results)
 
-    return jsonify({"Message": results}), 200
+    # Process the results
+    print(dishes)
+
+    return jsonify({"Message": dishes}), 200
 
 # Run the backend
 if __name__ == "__main__":
-    app.run(debug=False, host="0.0.0.0", port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5000)
