@@ -199,6 +199,32 @@ def prompt_model():
     
     # print('Ending time: {:2.2} seconds'.format(end_time))
 
+@app.route('/classify_dish', methods=['POST'])
+def prompt_culinaryBERT():
+    """
+        Prompt culinaryBERT to classify what was presented in front of it.
+        Used for dish and restaurant (in progress) classification.
+    """
+
+    # Grab the data
+    data = request.get_json()
+
+    if (request.method() != 'POST'):
+        return jsonify({"Error": "Invalid method request type"}), 400
+    
+    text = data['text'] if 'text' in data else ''
+
+    if not text:
+        return jsonify({"Error": "No text was sent to the backend"}), 400
+    
+    # Send the text to culinaryBERT
+    results = culinaryBERT_pipe(text)
+
+    # Process the results
+    print(results)
+
+    return jsonify({"Message": results}), 200
+
 # Run the backend
 if __name__ == "__main__":
     app.run(debug=False, host="0.0.0.0", port=5000)
