@@ -6,6 +6,7 @@ import ListTransition from '../components/ListTransition.js';
 import QuantityInput from './QuantityInput';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Grid } from 'react-virtualized';
+import { createIconSetFromFontello } from 'react-native-vector-icons';
 
 
 export const ElementContext = createContext(null);
@@ -16,11 +17,37 @@ function CravingWindow({ preferences, preferenceSetter, locationVal, locationSet
     const [shoppingCart, setShoppingCart] = useState({ dishes: [], restaurants: [] });
     const [toggleCart, setToggleCart] = useState(false);
     const [componentLoaded, setComponentLoaded] = useState(false);
+    const [newDish, setNewDish] = useState({ id: undefined, name: undefined })
     const animatedValue = useRef(new Animated.Value(0)).current;
 
     const [listHeight, setListHeight] = useState(0);
     const ref = useRef(null);
     const searchRef = useRef(null);
+
+    useEffect(() => {
+        const addDish = () => {
+            console.log("New Dish: ", newDish);
+
+            setShoppingCart(prevCart => ({
+                ...prevCart,
+                dishes: [...prevCart.dishes, newDish]
+            }));
+            // shoppingCart.dishes.push(newDish);
+
+            console.log("Added to cart: ", newDish.name);
+            console.log("Current cart: ", shoppingCart);
+
+            setCraving('');
+            if (searchRef.current) {
+                searchRef.current.clear();
+            }
+        }
+
+        if (newDish.id === undefined) {
+            return;
+        }
+        addDish();
+    }, [newDish])
 
 
     useEffect(() => {
@@ -42,26 +69,49 @@ function CravingWindow({ preferences, preferenceSetter, locationVal, locationSet
     const getItemCount = (data) => data.length;
 
 
-    const addToCart = (e) => {
+    const addToCart = async (e) => {
 
         if (!craving.trim()) {
             console.log('There is nothing in the text box');
             return;
+        } else {
+            setCraving(craving.trim());
         }
 
-        const newDish = { id: undefined, name: undefined };
-        newDish.id = Date.now().toString();
-        newDish.name = craving;
+        console.log(`Sending ${craving} to server!`);
+        try {
+            const response = await fetch('http://127.0.0.1:5000/classify_dish',
+                {
+                    method: "POST",
+                    mode: "cors",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ "text": craving })
+                });
 
-        console.log("New Dish: ", newDish);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
-        shoppingCart.dishes.push(newDish);
+            const data = await response.json();
+            const dishes = data['Message'];
+            console.log(data, dishes);
 
-        console.log("Added to cart: ", craving);
-        console.log("Current cart: ", shoppingCart);
-        setCraving('');
-        console.log("Text element", e);
-        searchRef.current.value = '';
+            if (Array.isArray(dishes)) {
+                dishes.forEach(dish => {
+                    const newDish = {
+                        id: Date.now().toString(),
+                        name: dish,
+                    };
+
+                    setNewDish(newDish);
+                });
+            }
+
+        } catch (error) {
+            console.error('Error sending request to server:', error);
+        }
     }
 
     const toggleShoppingCart = (e) => {
