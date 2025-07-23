@@ -1,11 +1,13 @@
 if __name__ == "__main__":
-    file = open(file='./train_original.txt', mode='r')
+    file = open(file='./train_original.txt', mode='r', encoding='utf-8')
     duplicates = 0
     duplicate_examples = []
+    borked_examples = []
 
     # All the unique stuff in the file
     unique_examples = []
     curr_example = ''
+
 
     positive_examples = 0
     negative_examples = 0
@@ -14,19 +16,27 @@ if __name__ == "__main__":
     skip = False
 
     line_num = 0
+    lines = file.readlines()
 
-    while (True):
-        curr_line = file.readline()
+    # while (True):
+    for line in lines:
+        # print(f'About to read line num: {line_num}')
         line_num += 1
 
+        curr_line = line
+
         # Done with the file
-        if (curr_line == ''):
-            break
+        # if (curr_line == ''):
+        #     break
 
         try:
             if (curr_line != '\n'):
                 # Lowercase the example on the current line
                 add_this: list[str] = curr_line.split()
+
+                if (len(add_this) != 2):
+                    raise ValueError()
+
                 add_this[0] = str.lower(add_this[0])
 
                 # Positive examples only contain non 'O' tags
@@ -34,6 +44,8 @@ if __name__ == "__main__":
                     is_positive = True
 
                 new_line = " ".join(add_this)
+
+                new_line.strip()
                 
                 # print("Current new line: ", new_line)
 
@@ -41,12 +53,16 @@ if __name__ == "__main__":
                 bytes_line = new_line.encode(encoding='ascii', errors='strict')
                 safe_line = bytes_line.decode(encoding='utf-8', errors='strict')
 
-                print("safe line: ", safe_line)
+                # print("safe line: ", safe_line)
 
                 curr_example += safe_line + '\n'
                 continue
-        except UnicodeEncodeError:
+        except UnicodeEncodeError as e:
             # print('borked data found, skipping!')
+            borked_examples.append(new_line)
+            skip = True
+        except ValueError as e:
+            print(f'Yo this is cooked (Line num: {line_num}): ', add_this)
             skip = True
 
         try:
@@ -78,10 +94,11 @@ if __name__ == "__main__":
 
     # print('Unique set: ', unique_examples)
     print('Number of unique elements: ', len(unique_examples))
-    print(f'Duplicates ({duplicates}): ', duplicate_examples)    
+    print(f'Duplicates : {duplicates}')    
     print('Positive examples: ', positive_examples)
     print('Negative examples: ', negative_examples)
     print('Borked: ', borked)
+    print('Borked Stuff:', borked_examples)
 
     try:
         with open('./unique_stuff.txt', 'w') as unique_file:
