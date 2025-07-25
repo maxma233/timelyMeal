@@ -3,31 +3,31 @@ from typing import List, Union
 
 import numpy as np
 import torch
-from transformers import (
-    DistilBertForTokenClassification,
-    DistilBertTokenizerFast,
-)
+from transformers import DistilBertForTokenClassification, DistilBertTokenizerFast, pipeline, BertTokenizer, BertModel
+
 
 # import food_extractor
 # from food_extractor.data_utils import id2tag, id2tag_no_prod, flatten
-from data_utils import id2tag_no_prod, flatten
+from data_utils import flatten, id2tag
 
 # HF_MODEL_PATH = "chambliss/distilbert-for-food-extraction"
-HF_MODEL_PATH = 'distilbert/distilbert-base-uncased'
+HF_MODEL_PATH_BASE = 'distilbert/distilbert-base-uncased'
+# HF_MODEL_PATH_BASE = 'google-bert/bert-base-uncased'
 
 
 class FoodModel:
-    def __init__(self, model_path: str = HF_MODEL_PATH, no_product_labels: bool = False):
+    def __init__(self, model_path: str = HF_MODEL_PATH_BASE, no_product_labels: bool = False):
 
-        if model_path == HF_MODEL_PATH:
+        if model_path == HF_MODEL_PATH_BASE:
             self.model = DistilBertForTokenClassification.from_pretrained(
-                HF_MODEL_PATH
+                HF_MODEL_PATH_BASE
             )
         else:
             self.model = DistilBertForTokenClassification.from_pretrained(model_path)
+            print(f'loading model from: {model_path}')
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.tokenizer = get_tokenizer()
-        self.label_dict = id2tag if no_product_labels == False else id2tag_no_prod
+        self.label_dict = id2tag
 
         self.model.to(self.device)
         self.model.eval()
@@ -42,32 +42,56 @@ class FoodModel:
         Returns each token, its label, and the probability given to that label.
         Currently just does batch size 0.
 
+        NOTE: Now uses a pipeline in order to insure consistency and retain the highest accuracy results
+        TODO: Redo the system and use pipeline to grab results. Also make sure to parse out correctly.
+
         Anecdotally, performance decreases on longer texts.
         (Shorter examples = better performance)
         For best results, try to reduce your inputs to sentences or
         other short pieces of text, rather than paragraphs.
         """
 
+        eval_pipe = pipeline("ner", model="", tokenizer="", device="cuda" if torch.cuda.is_avaliable() else "cpu")
+
+        # print('Texts: ', texts)
+
         # Accommodate single-item list
         if type(texts) == str:
             texts = [texts]
 
-        n_examples = len(texts)
-        encodings = self.tokenizer(
-            texts,
-            padding=True,
-            truncation=True,
-            add_special_tokens=False,
-            return_tensors="pt",
-        )
-        encodings.to(self.device)
+        # n_examples = len(texts)
+        # encodings = self.tokenizer(
+        #     texts,
+        #     # is_split_into_words=True,
+        #     padding=True,
+        #     truncation=True,
+        #     add_special_tokens=False,
+        #     return_tensors="pt",
+        # )
+        # encodings.to(self.device)
 
-        # Convert the logits to probabilities
-        logits = self.model.forward(encodings["input_ids"])[0]
-        probs_per_token = torch.nn.functional.softmax(logits, dim=2)
-        max_probs_per_token = torch.max(probs_per_token, dim=2)
-        probs, preds = max_probs_per_token.values, max_probs_per_token.indices
-        labels = [self.ids_to_labels(p) for p in preds]
+        # ## Convert the logits to probabilities
+
+        # # Get the raw prediction scores
+        # logits = self.model.forward(encodings["input_ids"])[0]
+
+        # # Apply a softmax to get a distribution of scores
+        # probs_per_token = torch.nn.functional.softmax(logits, dim=2)
+
+        # # Select the highest prediction score with the correlated index
+        # max_probs_per_token = torch.max(probs_per_token, dim=2)
+
+        # # print(max_probs_per_token)
+    
+        # # Split up the prediction scores and the prediction indexes
+        # probs, preds = max_probs_per_token.values, max_probs_per_token.indices
+        
+        # # print("PROBS:", probs)
+        # # print("PREDS:", preds)
+
+        # labels = [self.ids_to_labels(p) for p in preds]
+
+        # print("Made labels!")
 
         # Create readable dicts for the various components of each prediction
         # and convert the BIO tag predictions to actual entity spans
