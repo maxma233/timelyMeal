@@ -4,7 +4,7 @@ from typing import Dict, List
 import torch
 from torch.utils.data import Dataset
 import transformers
-from transformers import DistilBertTokenizerFast
+from transformers import DistilBertTokenizerFast, BertTokenizerFast
 import random
 
 # BIO Tags
@@ -13,14 +13,7 @@ tag2id = dict(zip(UNIQUE_TAGS, [0, 1, 2, 3, 4]))
 id2tag = {id: tag for tag, id in tag2id.items()}
 
 # Instantiate tokenizer
-# NOTE: Will tokenize to lowercase 
-bert_tokenizer = DistilBertTokenizerFast.from_pretrained('distilbert-base-uncased', do_lower_case=True)
-
-# def get_tokenizer():
-#     tokenizer = DistilBertTokenizerFast.from_pretrained(
-#         "distilbert-base-cased", do_lower_case=False
-#     )
-#     return tokenizer
+bert_tokenizer = BertTokenizerFast.from_pretrained('bert-base-cased')
 
 def flatten(l: List[list]) -> list:
     """
@@ -161,7 +154,7 @@ def preprocess_bio_data(data, prop_train=0.8, max_length=128):
     # Ex: [0, 1, 2] => [2, 0, 1]
 
 
-    random.seed(random.randint(0,100))  # For reproducibility
+    random.seed(42)  # For reproducibility
     random.shuffle(list_index_vals)
 
     # Shuffle all of the lists

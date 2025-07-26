@@ -3,7 +3,7 @@ from typing import List, Union
 
 import numpy as np
 import torch
-from transformers import DistilBertForTokenClassification, DistilBertTokenizerFast, pipeline, BertTokenizer, BertModel
+from transformers import DistilBertForTokenClassification, DistilBertTokenizerFast, pipeline, BertTokenizerFast, BertForTokenClassification
 
 
 # import food_extractor
@@ -11,19 +11,19 @@ from transformers import DistilBertForTokenClassification, DistilBertTokenizerFa
 from data_utils import flatten, id2tag
 
 # HF_MODEL_PATH = "chambliss/distilbert-for-food-extraction"
-HF_MODEL_PATH_BASE = 'distilbert/distilbert-base-uncased'
-# HF_MODEL_PATH_BASE = 'google-bert/bert-base-uncased'
+# HF_MODEL_PATH_BASE = 'distilbert/distilbert-base-uncased'
+HF_MODEL_PATH_BASE = 'bert-base-cased'
 
 
 class FoodModel:
     def __init__(self, model_path: str = HF_MODEL_PATH_BASE, no_product_labels: bool = False):
 
         if model_path == HF_MODEL_PATH_BASE:
-            self.model = DistilBertForTokenClassification.from_pretrained(
+            self.model = BertForTokenClassification.from_pretrained(
                 HF_MODEL_PATH_BASE
             )
         else:
-            self.model = DistilBertForTokenClassification.from_pretrained(model_path)
+            self.model = BertForTokenClassification.from_pretrained(model_path)
             print(f'loading model from: {model_path}')
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.tokenizer = get_tokenizer()
@@ -308,8 +308,8 @@ class UnknownFormatError(Exception):
 
 
 def get_tokenizer():
-    tokenizer = DistilBertTokenizerFast.from_pretrained(
-        "distilbert-base-cased", do_lower_case=False
+    tokenizer = BertTokenizerFast.from_pretrained(
+        "bert-based-uncased"
     )
     return tokenizer
 

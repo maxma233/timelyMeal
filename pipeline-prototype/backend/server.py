@@ -4,7 +4,17 @@ import time as t
 
 # Used for the LMs
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, pipeline, DistilBertForTokenClassification, DistilBertTokenizerFast
+from transformers import (
+    AutoTokenizer,
+    AutoModelForCausalLM, 
+    BitsAndBytesConfig, 
+    pipeline, 
+    DistilBertForTokenClassification, 
+    DistilBertTokenizerFast, 
+    BertForTokenClassification,
+    BertTokenizerFast
+)
+
 import gc
 from huggingface_hub import login
 
@@ -41,7 +51,6 @@ from parse_culinaryBERT import get_dishes
 # Initialize the classifier
 classifier = Classifier(file_location=DEFAULT_FILE_LOCATION)
 
-
 # Use CUDA for the model
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
@@ -49,8 +58,10 @@ device = "cuda:0" if torch.cuda.is_available() else "cpu"
 model_name = "timely/TimelyAI"
 secret_token = os.getenv("SECRET_KEY")
 
-culinaryBERT_tokenizer = DistilBertTokenizerFast.from_pretrained("distilbert-base-cased")
-culinaryBERT_model = DistilBertForTokenClassification.from_pretrained(culinaryBERT_filepath)
+# culinaryBERT_tokenizer = DistilBertTokenizerFast.from_pretrained("distilbert-base-cased")
+# culinaryBERT_model = DistilBertForTokenClassification.from_pretrained(culinaryBERT_filepath)
+culinaryBERT_tokenizer = BertTokenizerFast.from_pretrained('bert-base-cased')
+culinaryBERT_model = BertForTokenClassification.from_pretrained(culinaryBERT_filepath)
 culinaryBERT_model.to(device)
 
 # Login
