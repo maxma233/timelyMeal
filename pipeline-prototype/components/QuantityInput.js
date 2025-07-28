@@ -18,8 +18,8 @@ function QuantityInput({ quantity, setQuantity, onButtonDeletion }) {
     }
 
     return (
-        <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 2, borderColor: '#ccc', borderWidth: '2px', backgroundColor: '#eee', borderRadius: '5px' }}>
+        <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', alignSelf: 'center' }}>
+            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderColor: '#ccc', borderWidth: '2px', backgroundColor: '#eee', borderRadius: '5px' }}>
                 <Pressable
                     onPress={quantity < 1 ? onButtonDeletion : decrement}
                     style={{ padding: 10, backgroundColor: '#f0f0f0', borderRadius: 5 }}
@@ -36,8 +36,6 @@ function QuantityInput({ quantity, setQuantity, onButtonDeletion }) {
                 </Pressable>
 
             </View>
-
-
         </View >
 
     );
