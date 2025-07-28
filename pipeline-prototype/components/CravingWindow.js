@@ -7,10 +7,11 @@ import QuantityInput from './QuantityInput';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Grid } from 'react-virtualized';
 import { createIconSetFromFontello } from 'react-native-vector-icons';
+import { LocationContext } from './QuestionnaireWindow.js';
 
 export const ElementContext = createContext(null);
 
-function CravingWindow({ preferences, preferenceSetter, locationVal, locationSetter }) {
+function CravingWindow({ preferences, preferenceSetter }) {
 
     const [craving, setCraving] = useState('');
     const [shoppingCart, setShoppingCart] = useState({ dishes: [], restaurants: [] });
@@ -27,6 +28,9 @@ function CravingWindow({ preferences, preferenceSetter, locationVal, locationSet
 
     const DISH_LIST_COLOR = '#A12';
     const RESTAURANT_LIST_COLOR = '#882';
+
+    // Location information
+    const { locationVal, setLocationVal } = useContext(LocationContext);
 
     useEffect(() => {
         const cartTagIsRestaurant = newDish.id === undefined;
@@ -72,13 +76,13 @@ function CravingWindow({ preferences, preferenceSetter, locationVal, locationSet
     }, []);
 
     if (locationVal !== 4) {
+        toggleCart ? setToggleCart(!toggleCart) : null;
         return;
     }
 
     // VirtualizedList helper functions
     const getItem = (data, index) => data[index];
     const getItemCount = (data) => data.length;
-
 
     const addToCart = async (e) => {
 
@@ -302,9 +306,9 @@ function CravingListElement({ item, shoppingCart, setShoppingCart, showQuantity 
 
                 <Pressable
                     onPress={() => { deleteItem(listElement.tag) }}
-                    style={{ padding: 10, backgroundColor: '#f0f0f0', borderRadius: 5 }}
+                    style={{ padding: 10, backgroundColor: '#f0f0f0' }}
                 >
-                    <Icon name='trash' type="material" size={10} color="#333" />
+                    <Icon name='trash' type="material" size={20} color="#333" />
                 </Pressable>
 
             }

@@ -1,15 +1,19 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, } from "react-native";
+import { useContext } from "react";
 import { ArrowLeft } from "lucide-react-native";
+import { LocationContext } from "./QuestionnaireWindow";
 
-function BackButton({ locationVal, locationSetter }) {
+function BackButton() {
+
+    const { locationVal, setLocationVal } = useContext(LocationContext);
 
     const clickHandler = (event) => {
         if (locationVal === 0) {
             return;
         }
-        locationSetter(locationVal - 1);
+        setLocationVal(locationVal - 1);
 
-        console.log(`Location Value: ${locationVal}`);
+        // console.log(`Location Value: ${locationVal}`);
     }
 
     return (
