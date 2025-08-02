@@ -8,6 +8,7 @@ import PreferenceWindow from "./PreferenceWindow";
 import CravingWindow from "./CravingWindow";
 import BackButton from "./BackButton";
 import { PageIndicator } from 'react-native-page-indicator';
+import ScheduleSelector from "./ScheduleSelector";
 
 export const LocationContext = createContext();
 
@@ -16,7 +17,7 @@ const DEFAULT_QUESTIONNAIRE = ['How would you like to eat?',
     'How many meals per day?',
     'Preferences?',
     'What are you craving?',
-    'What is the budget?',
+    // 'What is the budget?',
     'Do you need help scheduling?'];
 
 function QuestionnaireWindow() {
@@ -27,6 +28,7 @@ function QuestionnaireWindow() {
     const [preferences, setPreferences] = useState({ ethnicCuisines: [], dishes: [], restaurants: [] });
     const [budget, setBudget] = useState(0);
     const [schedulingFlag, setSchedulingFlag] = useState(false);
+    const [scheduleAhead, setScheduleAhead] = useState(null);
 
     // const renderedQuestions = () => {
 
@@ -58,7 +60,7 @@ function QuestionnaireWindow() {
 
 
                     <View style={{ alignSelf: 'flex-start', left: 0, display: 'flex', flexDirection: 'row', gap: '20px' }}>
-                        <PageIndicator style={{ alignSelf: 'flex-start' }} vertical={true} count={7} current={locationVal} />
+                        <PageIndicator style={{ alignSelf: 'center' }} vertical={true} count={DEFAULT_QUESTIONNAIRE.length} current={locationVal} />
 
                         <View style={{ display: 'flex', flexDirection: 'row', gap: '20px', margin: 'auto', width: '100%', justifyContent: 'space-evenly' }}>
                             <FoodTypeSelector foodTypeSetter={setFoodType} locationVal={locationVal} locationSetter={setLocationVal} />
@@ -66,6 +68,7 @@ function QuestionnaireWindow() {
                             <MealSelector mealSetter={setNumMeals} locationVal={locationVal} locationSetter={setLocationVal} />
                             <PreferenceWindow preferences={preferences} preferenceSetter={setPreferences} locationVal={locationVal} locationSetter={setLocationVal} />
                             <CravingWindow preferences={preferences} preferenceSetter={setPreferences} />
+                            <ScheduleSelector scheduleAhead={scheduleAhead} setScheduleAhead={setScheduleAhead} />
                         </View>
                     </View>
 
