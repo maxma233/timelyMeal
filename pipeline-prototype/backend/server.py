@@ -34,7 +34,8 @@ current_dir = Path(__file__).resolve().parent
 # Add the path correctly
 middleware_dir = current_dir.parent / 'middleware'
 classifier_dir = current_dir.parent.parent / 'DiscreteClassifier'
-culinaryBERT_filepath = '../../culinaryBERT/models/culinaryBERT'
+culinaryBERT_dish_filepath = '../../culinaryBERT/models/dish_ner/culinaryBERT'
+culinaryBERT_restaurant_filepath = '../../culinaryBERT/models/restaurant_ner/culinaryBERT'
 DEFAULT_FILE_LOCATION = classifier_dir / 'timelymealsdiscreteannotated.csv'
 
 if classifier_dir.exists() and middleware_dir.exists():
@@ -60,9 +61,14 @@ secret_token = os.getenv("SECRET_KEY")
 
 # culinaryBERT_tokenizer = DistilBertTokenizerFast.from_pretrained("distilbert-base-cased")
 # culinaryBERT_model = DistilBertForTokenClassification.from_pretrained(culinaryBERT_filepath)
+
 culinaryBERT_tokenizer = BertTokenizerFast.from_pretrained('bert-base-cased')
-culinaryBERT_model = BertForTokenClassification.from_pretrained(culinaryBERT_filepath)
-culinaryBERT_model.to(device)
+
+culinaryBERT_dish_model = BertForTokenClassification.from_pretrained(culinaryBERT_dish_filepath)
+culinaryBERT_restaurant_model = BertForTokenClassification.from_pretrained(culinaryBERT_restaurant_filepath)
+
+culinaryBERT_dish_model.to(device)
+culinaryBERT_restaurant_model.to(device)
 
 # Login
 login(token=secret_token)
@@ -102,7 +108,8 @@ login(token=secret_token)
 # Setting up pipeline
 # gemma_pipe = pipeline("text-generation", model="timely/TimelyAI", device="cpu", torch_dtype=torch.bfloat16)
  
-culinaryBERT_pipe = pipeline("ner", model=culinaryBERT_model, tokenizer=culinaryBERT_tokenizer, device="cpu")
+culinaryBERT_dish_pipe = pipeline("ner", model=culinaryBERT_dish_model, tokenizer=culinaryBERT_tokenizer, device="cpu")
+culinaryBERT_restaurant_pipe = pipeline("ner", model=culinaryBERT_restaurant_model, tokenizer=culinaryBERT_tokenizer, device="cpu")
 
 @app.route('/add', methods=['POST'])
 def append_to_classifier():
@@ -235,14 +242,15 @@ def prompt_culinaryBERT():
         return jsonify({"Error": "No text was sent to the backend"}), 400
     
     # Send the text to culinaryBERT
-    results = culinaryBERT_pipe(text)
+    # Need to determine someway to use both? Maybe codependently?
+    results = culinaryBERT_dish_pipe(text)
 
-    dishes = get_dishes(results)
+    dishes, type = get_dishes(results)
 
     # Process the results
     print(dishes)
 
-    return jsonify({"Message": dishes}), 200
+    return jsonify({"Message": dishes, "Type": type}), 200
 
 # Run the backend
 if __name__ == "__main__":
