@@ -13,7 +13,7 @@ export const ElementContext = createContext(null);
 
 function CravingWindow({ preferences, preferenceSetter }) {
 
-    const [craving, setCraving] = useState('');
+    // const [craving, setCraving] = useState('');
     const [shoppingCart, setShoppingCart] = useState({ dishes: [], restaurants: [] });
     const [listSelect, setListSelect] = useState('dishes');
     const [toggleCart, setToggleCart] = useState(false);
@@ -21,6 +21,7 @@ function CravingWindow({ preferences, preferenceSetter }) {
     const [newDish, setNewDish] = useState({ id: undefined, name: undefined, type: undefined });
     const [newRestaurant, setNewRestaurant] = useState({ id: undefined, name: undefined, type: undefined });
     const animatedValue = useRef(new Animated.Value(0)).current;
+
 
     const [listHeight, setListHeight] = useState(0);
     const ref = useRef(null);
@@ -31,6 +32,10 @@ function CravingWindow({ preferences, preferenceSetter }) {
 
     // Location information
     const { locationVal, setLocationVal } = useContext(LocationContext);
+
+    const goToScheduleSelector = () => {
+        setLocationVal(5);
+    }
 
     useEffect(() => {
         const cartTagIsRestaurant = newDish.id === undefined;
@@ -49,7 +54,6 @@ function CravingWindow({ preferences, preferenceSetter }) {
             console.log("Added to cart: ", (cartTagIsRestaurant ? newRestaurant.name : newDish.name));
             console.log("Current cart: ", shoppingCart);
 
-            setCraving('');
             if (searchRef.current) {
                 searchRef.current.clear();
             }
@@ -86,14 +90,20 @@ function CravingWindow({ preferences, preferenceSetter }) {
 
     const addToCart = async (e) => {
 
-        if (!craving.trim()) {
-            console.log('There is nothing in the text box');
-            return;
-        } else {
-            setCraving(craving.trim());
+        if (searchRef.current === null) {
+            throw new Error("The reference for the craving window is missing!");
         }
 
-        console.log(`Sending ${craving} to server!`);
+        let searchValue = searchRef.current.text || '';
+
+        if (!searchValue.trim()) {
+            console.log('There is nothing in the text box');
+            return;
+        }
+
+        searchValue = searchValue.trim();
+
+        console.log(`Sending ${searchValue} to server!`);
         try {
             const response = await fetch('http://127.0.0.1:5000/classify_dish',
                 {
@@ -102,7 +112,7 @@ function CravingWindow({ preferences, preferenceSetter }) {
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ "text": craving })
+                    body: JSON.stringify({ "text": searchValue })
                 });
 
             if (!response.ok) {
@@ -118,7 +128,7 @@ function CravingWindow({ preferences, preferenceSetter }) {
             if (items[0] === "") {
                 // Nothing was returned from the model
                 console.log('sending error!');
-                throw new Error(`The model did not parse out anything from the provided input ${craving}`);
+                throw new Error(`The model did not parse out anything from the provided input ${searchValue}`);
             }
 
             if (Array.isArray(items)) {
@@ -186,20 +196,10 @@ function CravingWindow({ preferences, preferenceSetter }) {
                         </View>
                     )}
                 />
-
-                {/* {shoppingCart.dishes.map((value, index) => (
-                    <View
-                        key={index}
-                        style={{ fontSize: '1.2rem', padding: '10px', margin: 0, width: '100%' }}
-                    >
-                        <CravingListElement name={value} shoppingCart={shoppingCart} setShoppingCart={setShoppingCart} />
-                    </View>
-                ))} */}
             </View >
         );
 
     }
-
 
     return (
         <View style={styles.window}>
@@ -211,8 +211,10 @@ function CravingWindow({ preferences, preferenceSetter }) {
                     placeholder={"Chicken Alfredo"}
                     placeholderTextColor={'rgba(0, 0, 0, 0.5)'}
                     ref={searchRef}
-                    onChangeText={setCraving}
-                    value={craving}
+                    // Save the value of the text into the reference
+                    onChangeText={(e) => (searchRef.current.text = e)}
+                // onChangeText={setCraving}
+                // value={}
                 >
                 </TextInput>
 
@@ -233,6 +235,15 @@ function CravingWindow({ preferences, preferenceSetter }) {
 
             </View>
 
+            {/* Add Next button */}
+            <View style={styles.nextButton}>
+                <Button
+                    onPress={goToScheduleSelector}
+                    title={"Next"}
+                    color={'#007AFF'}>
+                </Button>
+            </View>
+
             <ElementContext value={{
                 listHeight,
                 setListHeight,
@@ -241,7 +252,6 @@ function CravingWindow({ preferences, preferenceSetter }) {
             }}>
 
                 <ListTransition
-                    // listHeight={listHeight}
                     style={{
                         position: 'fixed',
                         bottom: 0,
@@ -268,14 +278,11 @@ function CravingWindow({ preferences, preferenceSetter }) {
 
             </ElementContext>
 
-
         </View>
     );
-
 }
 
 function CravingListElement({ item, shoppingCart, setShoppingCart, showQuantity }) {
-
 
     console.log("item: ", item);
     const listElement = item;
@@ -294,18 +301,17 @@ function CravingListElement({ item, shoppingCart, setShoppingCart, showQuantity 
         console.log(shoppingCart);
     }
 
-
     return (
         <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: '100%', padding: 10, paddingLeft: 5 }}>
 
             {showQuantity ? (
                 <View style={{ flex: 1, alignSelf: 'center' }}>
-                    <QuantityInput quantity={quantity} setQuantity={setQuantity} onButtonDeletion={deleteItem} />
+                    <QuantityInput quantity={quantity} setQuantity={setQuantity} onButtonDeletion={() => deleteItem(listElement.type)} />
                 </View>
             ) :
 
                 <Pressable
-                    onPress={() => { deleteItem(listElement.tag) }}
+                    onPress={() => { deleteItem(listElement.type) }}
                     style={{ padding: 10, backgroundColor: '#f0f0f0' }}
                 >
                     <Icon name='trash' type="material" size={20} color="#333" />
@@ -313,19 +319,11 @@ function CravingListElement({ item, shoppingCart, setShoppingCart, showQuantity 
 
             }
 
-
-
             <View style={{ flex: 1, paddingLeft: 5 }}>
                 <Text style={{ textAlign: 'center' }}>
                     {item.name}
                 </Text>
             </View>
-
-            {/* <Pressable
-                onPress={deleteItem}
-            >
-                <Icon name='trash' type='material' size={15} color="#333"></Icon>
-            </Pressable> */}
 
         </View>
     );
