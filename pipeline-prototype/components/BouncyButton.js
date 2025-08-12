@@ -10,9 +10,9 @@ import {
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import RNBounceable from "@freakycoder/react-native-bounceable";
 
-function BouncyButton({ title, onButtonClick }) {
-    let bouncyCheckboxRef = BouncyCheckbox;
-    const [checkboxState, setCheckboxState] = React.useState(false);
+function BouncyButton({ title, onButtonClick, isPreFilled }) {
+    // let bouncyCheckboxRef = BouncyCheckbox;
+    const [checkboxState, setCheckboxState] = React.useState(isPreFilled ? true : false);
     const value = title;
 
     const clickHandler = (isChecked) => {
@@ -37,12 +37,13 @@ function BouncyButton({ title, onButtonClick }) {
                 <View style={styles.titleCheckboxRow}>
                     <Text style={styles.titleText}>{title}</Text>
                     <BouncyCheckbox
-                        ref={bouncyCheckboxRef}
+                        // ref={bouncyCheckboxRef}
                         disableText
                         fillColor="#9342f5"
                         size={20}
                         iconImageStyle={styles.iconImageStyle}
                         iconStyle={{ borderColor: '#9342f5' }}
+                        isChecked={checkboxState}
                         onPress={isChecked => {
                             clickHandler(isChecked);
                         }}

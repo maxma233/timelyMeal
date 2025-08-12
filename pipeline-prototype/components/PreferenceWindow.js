@@ -1,33 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Button, StyleSheet, View } from "react-native";
 import PreferenceList from "./PreferenceList";
+import {LocationContext, QuestionnaireContext} from "./QuestionnaireWindow";
+import { ButtonContext } from "../App";
 
-function PreferenceWindow({ preferences, preferenceSetter, locationVal, locationSetter }) {
-
-    // const [showList, setShowList] = useState(false);
+function PreferenceWindow() {
+    const {locationVal, setLocationVal} = useContext(LocationContext);
+    const {questionnaireData, setQuestionnaireData} = useContext(QuestionnaireContext);
+    const parentButtonContext = useContext(ButtonContext);
 
     const clickHandler = (e) => {
-        locationSetter(locationVal + 1);
+        setLocationVal(locationVal + 1);
     }
-
-    if (locationVal !== 3) {
-        return;
-    }
-
 
     return (
 
         <View style={styles.container}>
-
-            <PreferenceList preferences={preferences} preferenceSetter={preferenceSetter} />
+            <PreferenceList />
             <View style={styles.buttonContainer}>
-
                 <Button
                     onPress={clickHandler}
-                    title="confirm"
-                    color="#841522"
+                    title={"next"}
+                    color={parentButtonContext.color}
+                    
+                    
                 />
-
             </View>
 
         </View>
@@ -39,19 +36,20 @@ function PreferenceWindow({ preferences, preferenceSetter, locationVal, location
 const styles = StyleSheet.create({
     container: {
         // flex: 1,
-        // position: 'relative',
-        margin: 'auto',
-        width: '75vw',
-        height: '100%',
+        position: 'relative',
+        // margin: 'auto',
+        width: '100%',
+        // height: '100%',
 
     },
     buttonContainer: {
-        zIndex: 10 | undefined,
-        position: 'fixed',
-        right: '15%',
-        bottom: '5%',
+        zIndex: 10,
+        position: 'absolute',
+        top: 0,
+        right: '-5rem',
+        // right: '15%',
+        // bottom: '5%',
         minWidth: 100,
-
     },
 })
 

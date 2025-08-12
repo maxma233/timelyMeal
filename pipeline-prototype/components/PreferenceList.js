@@ -1,37 +1,51 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext} from "react";
 import { Button, Pressable, StyleSheet, Text, View, ScrollView } from "react-native";
 import BouncyCheckBox from "react-native-bouncy-checkbox";
 import BouncyButton from "./BouncyButton";
 import { TextInput } from "react-native-paper";
+import {LocationContext, QuestionnaireContext} from "./QuestionnaireWindow";
+import { ButtonContext } from "../App";
 
 const DEFAULT_CUISINE_LIST = ['American', 'Mexican', 'Asian', 'Italian']
 // const DEFAULT_NUM_OPTIONS = 4
 
-function PreferenceList({ preferences, preferenceSetter }) {
-
+function PreferenceList() {
+    const parentButtonContext = useContext(ButtonContext);
+    const {questionnaireData, setQuestionnaireData} = useContext(QuestionnaireContext);
     const [showAddWindow, setShowAddWindow] = useState(false);
-    const [currentList, setCurrentList] = useState({ list: [...DEFAULT_CUISINE_LIST] });
-    const [itemName, setItemName] = useState('');
-    const [selectedItems, setSelectedItems] = useState([]);
 
-    console.log(preferences);
+    const filteredDefault = DEFAULT_CUISINE_LIST.filter((item) => !questionnaireData.preferences.ethnicCuisines.includes(item));
+    // console.log("Filtered list: ",filteredDefault);
+
+    useEffect(() => {
+        console.log("Ethnic Cuisines: ",questionnaireData.preferences.ethnicCuisines);
+    }, [questionnaireData.preferences.ethnicCuisines])
+
+    // const [currentList, setCurrentList] = useState({ list: [...DEFAULT_CUISINE_LIST] });
+    const [currentList, setCurrentList] = useState({ list: [...questionnaireData.preferences.ethnicCuisines, ...filteredDefault, ] });
+    const [itemName, setItemName] = useState('');
+    const [selectedItems, setSelectedItems] = useState([...questionnaireData.preferences.ethnicCuisines]);
 
     const handleSelection = (item, isSelected) => {
         let updatedSelection;
         if (isSelected) {
             updatedSelection = [...selectedItems, item];
         } else {
-            updatedSelection = selectedItems.filter(selectedItems => selectedItems != item);
+            updatedSelection = selectedItems.filter(
+                (selectedItems) => selectedItems != item
+            );
         }
         setSelectedItems(updatedSelection);
 
-        preferenceSetter(prev => ({
-            ...prev,
-            ethnicCuisines: updatedSelection
+        setQuestionnaireData((prev) => ({
+           ...prev,
+            preferences: {
+                ...prev.preferences,
+                ethnicCuisines: updatedSelection,
+            }
         }));
 
-        console.log(preferences);
-
+        console.log('preferences: ', questionnaireData.preferences)
     }
 
     console.log(`Current List: ${currentList.list}`);
@@ -55,6 +69,7 @@ function PreferenceList({ preferences, preferenceSetter }) {
             setCurrentList((prevList) => ({
                 list: [...prevList.list, itemName.trim()]
             }));
+            handleSelection(itemName.trim(), true);
             setItemName('');
             // setShowAddWindow(false);
         } else {
@@ -73,7 +88,10 @@ function PreferenceList({ preferences, preferenceSetter }) {
                     <View key={index} style={{ display: "flex" }}>
                         <PressableButton
                             title={item}
-                            onSelectionChange={(isSelected) => handleSelection(item, isSelected)} />
+                            color="red"
+                            onSelectionChange={(isSelected) => handleSelection(item, isSelected)} 
+                            prefilled={questionnaireData.preferences.ethnicCuisines.includes(item)}
+                            />
                     </View>
                 ))}
             </View>
@@ -85,7 +103,7 @@ function PreferenceList({ preferences, preferenceSetter }) {
             <View style={styles.popOutWindow}>
                 <Text>Hello! Add new preference here:</Text>
                 <TextInput
-                    placeholder="enter new cuisine type"
+                    placeholder="Enter new cuisine type"
                     style={{ marginBottom: '5px' }}
                     value={itemName}
                     onChangeText={(value) => setItemName(value)}
@@ -93,11 +111,16 @@ function PreferenceList({ preferences, preferenceSetter }) {
                 <View style={{ display: "flex", gap: '2px', width: '75%', alignSelf: 'center' }}>
                     <Button
                         title="Close"
+                        color={parentButtonContext.color}
                         onPress={() => setShowAddWindow(false)}
                     />
                     <Button
                         title="Add"
-                        onPress={() => addItem()}
+                        color={parentButtonContext.color}
+                        onPress={() => {
+                            addItem();
+                            // handleSelection(, true);
+                        }}
                     />
                 </View>
 
@@ -106,25 +129,26 @@ function PreferenceList({ preferences, preferenceSetter }) {
     }
 
     return (
-        <View style={{ width: '50%', alignSelf: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{ width: '100%', alignSelf: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
             <ScrollView
                 style={styles.list}
             // showsVerticalScrollIndicator={true}
             // showsHorizontalScrollIndicator={false}
             >
                 {loadList()}
-                {!showAddWindow &&
-                    <View style={{ width: '25%', alignSelf: 'center' }}>
-                        <Button
-                            title={"Add"}
-                            onPress={() => {
-                                setShowAddWindow(!showAddWindow)
-                            }}
-                        />
-                    </View>
-                }
 
             </ScrollView>
+            {!showAddWindow &&
+                <View style={{ width: 'fit-content', alignSelf: 'center' }}>
+                    <Button
+                        title={"custom preference"}
+                        color={parentButtonContext.color}
+                        onPress={() => {
+                            setShowAddWindow(!showAddWindow)
+                        }}
+                    />
+                </View>
+            }
             {showAddWindow && popOutWindow()}
         </View>
     );
@@ -133,7 +157,7 @@ function PreferenceList({ preferences, preferenceSetter }) {
 
 function PressableButton(PreferenceProps) {
 
-    const { title, onSelectionChange } = PreferenceProps;
+    const { title, onSelectionChange, prefilled } = PreferenceProps;
     const [toggle, setToggle] = useState('false');
     const name = title;
     const [isSelected, setIsSelected] = useState(false);
@@ -141,12 +165,12 @@ function PressableButton(PreferenceProps) {
     // console.log(`${title}, ${key}`);
     const clickHandler = (message) => {
 
-        console.log("Message from child", message);
+        // console.log("Message from child", message);
 
         const newSelection = !isSelected;
         setIsSelected(newSelection);
         onSelectionChange(newSelection);
-        console.log(`${title} is now ${newSelection ? 'selected' : 'unselected'}`);
+        // console.log(`${title} is now ${newSelection ? 'selected' : 'unselected'}`);
     }
 
 
@@ -154,7 +178,7 @@ function PressableButton(PreferenceProps) {
         <>
             <View style={styles.preferenceButton}>
                 {/* <Pressable onPress={clickHandler}> */}
-                <BouncyButton title={title} onButtonClick={clickHandler} />
+                <BouncyButton title={title} onButtonClick={clickHandler} isPreFilled={prefilled} />
                 {/* </Pressable> */}
             </View>
         </>
@@ -171,6 +195,7 @@ const styles = StyleSheet.create({
     list: {
         maxHeight: 200,
         width: '100%',
+        marginVertical: '1rem',
     },
     preferenceButton: {
         // padding: 10,
