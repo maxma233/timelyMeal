@@ -17,6 +17,8 @@ import IndicatorMorse from './IndicatorMorse';
 import IndicatorBeads from './IndicatorBeads';
 import IndicatorTrain from './IndicatorTrain';
 
+import { BeadThemeContext } from '../QuestionnaireWindow';
+
 enum Variants {
   MORSE = 'morse',
   BEADS = 'beads',
@@ -38,6 +40,8 @@ export interface PageIndicatorProps extends ViewProps {
   activeColor?: string;
   borderRadius?: number;
   easing?: EasingFunction;
+
+  beadReferences: any[];
 }
 
 export const PageIndicator = ({
@@ -60,6 +64,8 @@ export const PageIndicator = ({
 }: PageIndicatorProps) => {
 
   const { locationVal, setLocationVal } = useContext(LocationContext);
+  const { indicatorBeads } = useContext(BeadThemeContext);
+  console.dir(indicatorBeads);
 
   const pixelSize = evenPixelRound(size);
   const pixelDashSize = evenPixelRound(dashSize ?? pixelSize * 4);
@@ -95,52 +101,58 @@ export const PageIndicator = ({
   return (
     <View {...props} style={rootStyle}>
       {[...Array(count).keys()].map((index) =>
-        variant === Variants.BEADS ? (
-            <Pressable style={{ zIndex: 50 }} key={index} onPress={() => {setLocationVal(index)}} >
-              <IndicatorBeads
-                // key={index}
-                gap={gap}
-                size={pixelSize}
-                color={color}
-                index={index}
-                scale={scale}
-                vertical={vertical}
-                activeColor={activeColor}
-                opacity={clamp(opacity, 0, 1)}
-                borderRadius={pixelBorderRadius}
-                animatedValue={animatedValue}
-              />
-            </Pressable>
-        ) : variant === Variants.TRAIN ? (
-          <IndicatorTrain
-            key={index}
-            gap={gap}
-            size={size}
-            color={color}
-            index={index}
-            vertical={vertical}
-            activeColor={activeColor}
-            dashSize={trainDashSize}
-            opacity={clamp(opacity, 0, 1)}
-            borderRadius={pixelBorderRadius}
-            animatedValue={animatedValue}
-          />
-        ) : (
-          <IndicatorMorse
-            key={index}
-            gap={gap}
-            size={pixelSize}
-            color={color}
-            count={count}
-            index={index}
-            vertical={vertical}
-            activeColor={activeColor}
-            dashSize={morseDashSize}
-            opacity={clamp(opacity, 0, 1)}
-            borderRadius={pixelBorderRadius}
-            animatedValue={animatedValue}
-          />
-        ),
+        {
+          const component = 
+            (
+              variant === Variants.BEADS ? (
+                <Pressable style={{ zIndex: 50 }} key={index} onPress={() => {setLocationVal(index)}} >
+                  <IndicatorBeads
+                    // key={index}
+                    gap={gap}
+                    size={pixelSize}
+                    color={indicatorBeads[index]}
+                    index={index}
+                    scale={scale}
+                    vertical={vertical}
+                    activeColor={indicatorBeads[index]}
+                    opacity={clamp(opacity, 0, 1)}
+                    borderRadius={pixelBorderRadius}
+                    animatedValue={animatedValue}
+                  />
+                </Pressable>
+              ) : variant === Variants.TRAIN ? (
+                <IndicatorTrain
+                  key={index}
+                  gap={gap}
+                  size={size}
+                  color={color}
+                  index={index}
+                  vertical={vertical}
+                  activeColor={activeColor}
+                  dashSize={trainDashSize}
+                  opacity={clamp(opacity, 0, 1)}
+                  borderRadius={pixelBorderRadius}
+                  animatedValue={animatedValue}
+                />
+              ) : (
+                <IndicatorMorse
+                  key={index}
+                  gap={gap}
+                  size={pixelSize}
+                  color={color}
+                  count={count}
+                  index={index}
+                  vertical={vertical}
+                  activeColor={activeColor}
+                  dashSize={morseDashSize}
+                  opacity={clamp(opacity, 0, 1)}
+                  borderRadius={pixelBorderRadius}
+                  animatedValue={animatedValue}
+                />
+              )
+            )
+          return component;
+        }
       )}
     </View>
   );
