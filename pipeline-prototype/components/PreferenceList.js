@@ -6,7 +6,8 @@ import { TextInput } from "react-native-paper";
 import {LocationContext, QuestionnaireContext} from "./QuestionnaireWindow";
 import { ButtonContext } from "../App";
 
-const DEFAULT_CUISINE_LIST = ['None', 'American', 'Mexican', 'Asian', 'Italian']
+const DEFAULT_NO_PREFERENCE_WORD = 'None';
+const DEFAULT_CUISINE_LIST = [DEFAULT_NO_PREFERENCE_WORD, 'American', 'Mexican', 'Asian', 'Italian']
 // const DEFAULT_NUM_OPTIONS = 4
 
 function PreferenceList() {
@@ -14,7 +15,9 @@ function PreferenceList() {
     const {questionnaireData, setQuestionnaireData} = useContext(QuestionnaireContext);
     const [showAddWindow, setShowAddWindow] = useState(false);
 
-    const filteredDefault = DEFAULT_CUISINE_LIST.filter((item) => !questionnaireData.preferences.ethnicCuisines.includes(item));
+    const filteredDefault = DEFAULT_CUISINE_LIST.filter((item) => {
+         return !questionnaireData.preferences.ethnicCuisines.includes(item) && !questionnaireData.preferences.ethnicCuisines.includes(DEFAULT_NO_PREFERENCE_WORD);
+    } );
     // console.log("Filtered list: ",filteredDefault);
 
     useEffect(() => {
@@ -23,16 +26,16 @@ function PreferenceList() {
 
     // const [currentList, setCurrentList] = useState({ list: [...DEFAULT_CUISINE_LIST] });
     const [currentList, setCurrentList] = useState({ list: [...questionnaireData.preferences.ethnicCuisines, ...filteredDefault, ] });
-    const currentListSaveState = useRef(null);
+    const currentListSaveState = useRef({ list: DEFAULT_CUISINE_LIST });
     const [itemName, setItemName] = useState('');
     const [selectedItems, setSelectedItems] = useState([...questionnaireData.preferences.ethnicCuisines]);
 
     const handleSelection = (item, isSelected) => {
         let updatedSelection;
-        const noneFlag = item === "None";
+        const noneFlag = item === DEFAULT_NO_PREFERENCE_WORD;
 
         if (noneFlag && isSelected) {
-            updatedSelection = ["None"];
+            updatedSelection = [DEFAULT_NO_PREFERENCE_WORD];
             setCurrentList((prev) => {
                 currentListSaveState.current = prev;
                 return { list: updatedSelection } 
@@ -79,16 +82,18 @@ function PreferenceList() {
 
     const addItem = () => {
 
-        if (itemName.trim()) {
+        const trimmedName = itemName.trim();
 
+        if (trimmedName && trimmedName !== DEFAULT_NO_PREFERENCE_WORD && !currentList.list.includes(trimmedName)) {
+        
             setCurrentList((prevList) => ({
-                list: [...prevList.list, itemName.trim()]
+                list: [...prevList.list, trimmedName]
             }));
-            handleSelection(itemName.trim(), true);
+            handleSelection(trimmedName, true);
             setItemName('');
             // setShowAddWindow(false);
         } else {
-            throw new Error("Adding empty string to list!");
+            throw new Error("Adding unnecessary value to list");
         }
 
         console.log(currentList);
@@ -175,7 +180,7 @@ function PressableButton(PreferenceProps) {
     const { title, onSelectionChange, prefilled } = PreferenceProps;
     const [toggle, setToggle] = useState('false');
     const name = title;
-    const [isSelected, setIsSelected] = useState(false);
+    const [isSelected, setIsSelected] = useState(prefilled);
 
     // console.log(`${title}, ${key}`);
     const clickHandler = (message) => {
