@@ -1,26 +1,47 @@
-import { Button, View } from "react-native"
+import { Button, View } from "react-native";
+import { useContext, useState } from "react";
+import { LocationContext, QuestionnaireContext } from "./QuestionnaireWindow";
+import { ButtonContext } from "../App";
 
-function MealSelector(props) {
-
-    const { mealSetter, locationVal, locationSetter } = props;
-
+function MealSelector() {
+    
+    const { locationVal, setLocationVal } = useContext(LocationContext);
+    const { questionnaireData, setQuestionnaireData } = useContext(QuestionnaireContext);
+    const [ buttonSelected, setButtonSelected ] = useState(null);
+    const parentThemeContext = useContext(ButtonContext);
 
     const mealHandler = (mealVal) => {
-        mealSetter(mealVal);
-        locationSetter(locationVal + 1);
+        setButtonSelected(mealVal);
+        setQuestionnaireData((prev) => ({ ...prev, numMeals: mealVal}))
     }
 
-    if (locationVal !== 2) {
-        return (
-            <></>
-        );
+    const isSelected = (buttonVal) => {
+        return buttonSelected === buttonVal; 
     }
 
     return (
         <>
-            <Button onPress={() => mealHandler(2)} title='2 Meals'></Button>
-            <Button onPress={() => mealHandler(3)} title='3 Meals'></Button>
-            <Button onPress={() => mealHandler(4)} title='4 Meals'></Button>
+            <View style={{ opacity: isSelected(2) || buttonSelected === null ? 1 : 0.5}}>
+                <Button
+                    color={parentThemeContext.color} 
+                    onPress={() => mealHandler(2)} 
+                    title='2 Meals' 
+                    />
+            </View>
+            <View style={{ opacity: isSelected(3) || buttonSelected === null ? 1 : 0.5}}>
+                <Button 
+                    color={parentThemeContext.color}
+                    onPress={() => mealHandler(3)} 
+                    title='3 Meals' 
+                    />
+            </View>
+            <View style={{ opacity: isSelected(4) || buttonSelected === null ? 1 : 0.5}}>
+                <Button 
+                    color={parentThemeContext.color}
+                    onPress={() => mealHandler(4)} 
+                    title='4 Meals' 
+                    />
+            </View>
         </>
     );
 
