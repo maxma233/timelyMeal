@@ -1,0 +1,30 @@
+name: hf-nlp
+channels:
+  - conda-forge
+  - pytorch
+  - defaults
+dependencies:
+  - python=3.10
+  - torch
+  - pip
+  - pytorch
+  # - cudatoolkit=11.8  # Adjust based on your NVIDIA driver
+  - numpy
+  - pandas
+  - scikit-learn
+  - scipy
+  - pytest
+  - joblib
+  - python-dateutil
+  - pytz
+  - pip:
+      - transformers>=4.44.2
+      - tokenizers>=0.19.1
+      - sentencepiece>=0.2.0
+      - requests
+      - tqdm
+      - sacremoses
+      - regex
+      - click
+      - filelock
+prefix: /home/charlenechambliss/anaconda3/envs/hf-nlp
