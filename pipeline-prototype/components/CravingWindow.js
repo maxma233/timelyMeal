@@ -7,13 +7,12 @@ import QuantityInput from './QuantityInput';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Grid } from 'react-virtualized';
 import { createIconSetFromFontello } from 'react-native-vector-icons';
-import { LocationContext } from './QuestionnaireWindow.js';
+import { LocationContext, QuestionnaireContext } from './QuestionnaireWindow.js';
 
 export const ElementContext = createContext(null);
 
-function CravingWindow({ preferences, preferenceSetter }) {
+function CravingWindow() {
 
-    // const [craving, setCraving] = useState('');
     const [shoppingCart, setShoppingCart] = useState({ dishes: [], restaurants: [] });
     const [listSelect, setListSelect] = useState('dishes');
     const [toggleCart, setToggleCart] = useState(false);
@@ -21,7 +20,6 @@ function CravingWindow({ preferences, preferenceSetter }) {
     const [newDish, setNewDish] = useState({ id: undefined, name: undefined, type: undefined });
     const [newRestaurant, setNewRestaurant] = useState({ id: undefined, name: undefined, type: undefined });
     const animatedValue = useRef(new Animated.Value(0)).current;
-
 
     const [listHeight, setListHeight] = useState(0);
     const ref = useRef(null);
@@ -32,6 +30,16 @@ function CravingWindow({ preferences, preferenceSetter }) {
 
     // Location information
     const { locationVal, setLocationVal } = useContext(LocationContext);
+    const { questionnaireData, setQuestionnaireData } = useContext(QuestionnaireContext);
+    
+    useEffect(() => {
+        setComponentLoaded(true);
+
+        if (ref.current) {
+            console.log("Component has loaded!");
+            setListHeight(ref.current.clientHeight);
+        }
+    }, []);
 
     const goToScheduleSelector = () => {
         setLocationVal(5);
@@ -44,18 +52,22 @@ function CravingWindow({ preferences, preferenceSetter }) {
             console.log("New Item: ", newDish);
             console.log("List type:", listType);
 
-            setShoppingCart(prevCart => ({
-                ...prevCart,
-                // dishes: [...prevCart.dishes, newDish]
-                [listType]: [...prevCart[listType], (cartTagIsRestaurant ? newRestaurant : newDish)]
+            // Have to first access the preferences from thee questionnaireData before any mutation
+            setQuestionnaireData(prev => ({
+                ...prev,
+                preferences: {
+                    ...prev.preferences, // All previous preference instances
+                    // Using a dynamic variable, you can encapsulate it in '[]' to evaluate the attribute name during runtime
+                    // Also, grabbing the rest of the preferences on the provided listType and adding the new item
+                    [listType]: [...prev.preferences[listType], (cartTagIsRestaurant ? newRestaurant : newDish)]
+                } 
             }));
-            // shoppingCart.dishes.push(newDish);
 
             console.log("Added to cart: ", (cartTagIsRestaurant ? newRestaurant.name : newDish.name));
-            console.log("Current cart: ", shoppingCart);
+            console.log("Current cart: ", questionnaireData.preferences);
 
-            if (searchRef.current) {
-                searchRef.current.clear();
+            if (searchRef.current.text) {
+                searchRef.current.text = '';
             }
 
             cartTagIsRestaurant ? setNewRestaurant(resetValues) : setNewDish(resetValues);
@@ -67,22 +79,6 @@ function CravingWindow({ preferences, preferenceSetter }) {
 
         addItem(cartTagIsRestaurant ? "restaurants" : "dishes");
     }, [newDish, newRestaurant])
-
-
-    useEffect(() => {
-
-        setComponentLoaded(true);
-
-        if (ref.current) {
-            console.log("Component has loaded!");
-            setListHeight(ref.current.clientHeight);
-        }
-    }, []);
-
-    if (locationVal !== 4) {
-        toggleCart ? setToggleCart(!toggleCart) : null;
-        return;
-    }
 
     // VirtualizedList helper functions
     const getItem = (data, index) => data[index];
@@ -162,13 +158,13 @@ function CravingWindow({ preferences, preferenceSetter }) {
                         onPress={() => { setListSelect('dishes') }}
                     >
                         {/* Type notification */}
-                        {shoppingCart.dishes.length != 0 && <Text style={{ position: 'absolute', top: 0, right: 0, zIndex: 1, backgroundColor: '#F44322', borderRadius: '40px', color: '#FFF', width: '20px', textAlign: 'center', aspectRatio: 1 / 1, }}>{shoppingCart.dishes.length}</Text>}
+                        {questionnaireData.preferences.dishes.length != 0 && <Text style={{ position: 'absolute', top: 0, right: 0, zIndex: 1, backgroundColor: '#F44322', borderRadius: '40px', color: '#FFF', width: '20px', textAlign: 'center', aspectRatio: 1 / 1, }}>{questionnaireData.preferences.dishes.length}</Text>}
                         <Text style={{ fontSize: '1.5rem', flex: 1, paddingHorizontal: '25px', textAlign: 'center', backgroundColor: DISH_LIST_COLOR, borderTopLeftRadius: '24px', borderTopRightRadius: '24px' }}>Dishes</Text>
                     </Pressable>
                     <Pressable
                         onPress={() => { setListSelect('restaurants') }}
                     >
-                        {shoppingCart.restaurants.length != 0 && <Text style={{ position: 'absolute', top: 0, right: 0, zIndex: 1, backgroundColor: '#F44322', borderRadius: '40px', color: '#FFF', width: '20px', textAlign: 'center', aspectRatio: 1 / 1, }}>{shoppingCart.restaurants.length}</Text>}
+                        {questionnaireData.preferences.restaurants.length != 0 && <Text style={{ position: 'absolute', top: 0, right: 0, zIndex: 1, backgroundColor: '#F44322', borderRadius: '40px', color: '#FFF', width: '20px', textAlign: 'center', aspectRatio: 1 / 1, }}>{questionnaireData.preferences.restaurants.length}</Text>}
                         <Text style={{ fontSize: '1.5rem', flex: 1, paddingHorizontal: '25px', textAlign: 'center', backgroundColor: RESTAURANT_LIST_COLOR, borderTopLeftRadius: '24px', borderTopRightRadius: '24px' }}>Restaurants</Text>
                     </Pressable>
                 </View>
@@ -179,7 +175,7 @@ function CravingWindow({ preferences, preferenceSetter }) {
 
                 {/* VirtualizedList for displaying the active list of dishes */}
                 <VirtualizedList
-                    data={list == 'dishes' ? shoppingCart['dishes'] : shoppingCart['restaurants']}
+                    data={list == 'dishes' ? questionnaireData.preferences['dishes'] : questionnaireData.preferences['restaurants']}
                     getItem={getItem}
                     getItemCount={getItemCount}
                     keyExtractor={item => item.id}
@@ -192,7 +188,7 @@ function CravingWindow({ preferences, preferenceSetter }) {
                         <View
                             style={{ fontSize: '1.2rem', padding: '10px', margin: 0, width: '100%' }}
                         >
-                            <CravingListElement item={item} shoppingCart={shoppingCart} setShoppingCart={setShoppingCart} showQuantity={list == 'dishes' ? true : false} />
+                            <CravingListElement item={item} showQuantity={list == 'dishes' ? true : false} />
                         </View>
                     )}
                 />
@@ -282,7 +278,9 @@ function CravingWindow({ preferences, preferenceSetter }) {
     );
 }
 
-function CravingListElement({ item, shoppingCart, setShoppingCart, showQuantity }) {
+function CravingListElement({ item, showQuantity }) {
+
+    const { questionnaireData, setQuestionnaireData } = useContext(QuestionnaireContext);
 
     console.log("item: ", item);
     const listElement = item;
@@ -293,12 +291,18 @@ function CravingListElement({ item, shoppingCart, setShoppingCart, showQuantity 
     const deleteItem = (type) => {
         const shoppingCartListPtr = type === 'DISH' ? 'dishes' : 'restaurants';
 
-        console.log('shopping cart', shoppingCart)
+        console.log('shopping cart', questionnaireData.preferences)
 
-        const updatedList = shoppingCart[shoppingCartListPtr].filter((value, index) => (value.id !== id));
+        const updatedList = questionnaireData.preferences[shoppingCartListPtr].filter((value, index) => (value.id !== id));
 
-        setShoppingCart({ ...shoppingCart, [shoppingCartListPtr]: [...updatedList] });
-        console.log(shoppingCart);
+        setQuestionnaireData((prev) => ({ 
+            ...prev, 
+            preferences: {
+                ...prev.preferences,
+                [shoppingCartListPtr]: [...updatedList]
+        } }));
+
+        console.log(questionnaireData.preferences);
     }
 
     return (
