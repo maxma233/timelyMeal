@@ -6,6 +6,11 @@ from torch.utils.data import Dataset
 import transformers
 from transformers import DistilBertTokenizerFast, BertTokenizerFast
 import random
+import logging
+import os
+
+# Add logger to account for bad data
+logger = logging.getLogger("errors")
 
 # BIO Tags
 UNIQUE_TAGS = ["B-DISH", "I-DISH", "O", 'B-RESTAURANT', 'I-RESTAURANT']
@@ -78,6 +83,12 @@ def preprocess_bio_data(data, prop_train=0.8, max_length=128):
     
     """
 
+    logging.basicConfig(
+        filename=os.path.join('./', "preds.log"),
+        format="%(message)s",
+        filemode="w",
+    )
+
     # tokenizer = DistilBertTokenizerFast.from_pretrained("distilbert-base-cased")
     tokenizer = bert_tokenizer
     label_to_id = {"B-DISH": 0, "I-DISH": 1, "O": 2, "B-RESTAURANT": 3, "I-RESTAURANT": 4}
@@ -109,7 +120,7 @@ def preprocess_bio_data(data, prop_train=0.8, max_length=128):
 
     encodings = []
     labels = []
-    for tokens, token_labels in sentences:
+    for sentence_index, (tokens, token_labels) in enumerate(sentences):
         # Tokenize the sentence (tokens)
         tokenized = tokenizer(
             tokens,
@@ -132,7 +143,13 @@ def preprocess_bio_data(data, prop_train=0.8, max_length=128):
             else:
                 # Getting the label that correlates to the word id and then 
                 # translating that to the text version of the label
-                aligned_labels.append(label_to_id[token_labels[word_id]])
+
+                try:
+                    aligned_labels.append(label_to_id[token_labels[word_id]])
+                except KeyError:
+                    aligned_labels.append(-100)
+                    logger.error(f'An error occurred on line {sentence_index} for {word_id} from {token_labels}')
+                    pass
 
         # These will be both reflect each other [0] in one list correlates to [0] in the other
         encodings.append({
@@ -173,7 +190,6 @@ def preprocess_bio_data(data, prop_train=0.8, max_length=128):
     
     train_sentences = sentences[:split_idx]
     test_sentences = sentences[split_idx:]
-    # print("Test Sentences: ", test_sentences)
 
     return train_encodings, train_labels, val_encodings, val_labels, train_sentences, test_sentences
 
