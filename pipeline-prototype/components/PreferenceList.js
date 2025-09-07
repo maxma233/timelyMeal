@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext} from "react";
+import React, { useEffect, useState, useRef, useContext} from "react";
 import { Button, Pressable, StyleSheet, Text, View, ScrollView } from "react-native";
 import BouncyCheckBox from "react-native-bouncy-checkbox";
 import BouncyButton from "./BouncyButton";
@@ -6,7 +6,7 @@ import { TextInput } from "react-native-paper";
 import {LocationContext, QuestionnaireContext} from "./QuestionnaireWindow";
 import { ButtonContext } from "../App";
 
-const DEFAULT_CUISINE_LIST = ['American', 'Mexican', 'Asian', 'Italian']
+const DEFAULT_CUISINE_LIST = ['None', 'American', 'Mexican', 'Asian', 'Italian']
 // const DEFAULT_NUM_OPTIONS = 4
 
 function PreferenceList() {
@@ -23,12 +23,27 @@ function PreferenceList() {
 
     // const [currentList, setCurrentList] = useState({ list: [...DEFAULT_CUISINE_LIST] });
     const [currentList, setCurrentList] = useState({ list: [...questionnaireData.preferences.ethnicCuisines, ...filteredDefault, ] });
+    const currentListSaveState = useRef(null);
     const [itemName, setItemName] = useState('');
     const [selectedItems, setSelectedItems] = useState([...questionnaireData.preferences.ethnicCuisines]);
 
     const handleSelection = (item, isSelected) => {
         let updatedSelection;
-        if (isSelected) {
+        const noneFlag = item === "None";
+
+        if (noneFlag && isSelected) {
+            updatedSelection = ["None"];
+            setCurrentList((prev) => {
+                currentListSaveState.current = prev;
+                return { list: updatedSelection } 
+            });
+        } else if (noneFlag && !isSelected) {
+            updatedSelection = [];            
+            setCurrentList({ list: currentListSaveState.current.list ?? [] });
+        } else if (isSelected) {
+            // const noneFlag = selectedItems.includes["None"] || item === "None";
+            // console.log(noneFlag, selectedItems.includes["None"]);
+            // updatedSelection = noneFlag ? [item === "None" ? item : undefined] : [...selectedItems, item];
             updatedSelection = [...selectedItems, item];
         } else {
             updatedSelection = selectedItems.filter(
