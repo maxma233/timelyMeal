@@ -8,7 +8,7 @@ function DataChecker({ questions }) {
     const { indicatorBeads, setIndicatorBeads } = useContext(BeadThemeContext);
     const [questionCompleted, setQuestionCompleted] = useState(false);
     const [completedQuestions, setCompletedQuestions] = useState([false, false, false]);
-    let keys = [];
+    const keys = [];
 
     useEffect(() => {
         if (!completedQuestions[locationVal]) {
@@ -17,22 +17,22 @@ function DataChecker({ questions }) {
             setQuestionCompleted(false);
         }
     }, [locationVal])
-
+    
     console.log("Questions: ", questions);
     
     function keySearch(value, key) {
-        console.log("Key List");
-        console.dir(key);
+        // console.log("Key List");
+        // console.dir(key);
         if (key.length === 0) {
-            console.log('returning', value);
+            // console.log('returning', value);
             return value;
         }
         const searchKey = key.shift();
-        console.log("Search Key:", searchKey);
-        console.log("Located value: ", value[searchKey]);
+        // console.log("Search Key:", searchKey);
+        // console.log("Located value: ", value[searchKey]);
         return keySearch(value[searchKey], key);
     }
-
+    
     function parseKeys(keys) {
         if (!Array.isArray(keys[0])) {
             // console.log("RETURNING KEY VALUE", keys)
@@ -42,7 +42,7 @@ function DataChecker({ questions }) {
         // console.log("Current Value of Keys", currentVal);
         return parseKeys(currentVal);
     }
-
+    
     
     useEffect(() => {
         // keys = new Array();
@@ -50,24 +50,31 @@ function DataChecker({ questions }) {
             const key = [...question.checkFor];
             keys.push(key);
         }
-
+        
         console.log("Checking for ", keys);
         for (const key of keys) {
-            console.log("key");
-            console.dir(key);
+            // console.log("key");
+            // console.dir(key);
             
             const parse = [...key];
             const returnedKeySet = parseKeys(parse);
             const keyArray = [...returnedKeySet];
             const value = keySearch(questionnaireData, keyArray);
             console.log('value', value);
-            if (!value || value.length === 0) {
+            if (Array.isArray(value) && value.length === 0 || !value) {
                 setQuestionCompleted(false);   
+                indicatorBeads[locationVal] = "#B33";
                 completedQuestions[locationVal] = false;
                 setCompletedQuestions([...completedQuestions]);
+                setIndicatorBeads((prev) => ([...indicatorBeads]));
                 return;
             };
         }
+        
+        // Empty the keys list
+        // while (keys.length > 0) {
+            //     keys.pop();
+        // }
         
 
         setQuestionCompleted(true);
@@ -82,7 +89,7 @@ function DataChecker({ questions }) {
             indicatorBeads[locationVal] = "#3E3";
             setIndicatorBeads((prev) => ([...indicatorBeads]));
         }
-        console.log(questionCompleted);
+        // console.log(questionCompleted);
     }, [questionCompleted])
 
     return null;
