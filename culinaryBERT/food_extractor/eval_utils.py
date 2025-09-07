@@ -170,6 +170,10 @@ def judge_perf(perf_dict: dict):
 
 
 def reformat_true_labels(completions: list, no_product_labels: bool) -> dict:
+    """
+       Convert the provided TRUE completions that match up with the proper tags
+       [DISH, RESTAURANT] and turn it into a more digestible form that can later be parsed out. 
+    """
     reformatted = {"DISH": [], "RESTAURANT": []}
     try:
         labels = completions[0]["result"]
@@ -190,7 +194,10 @@ def reformat_true_labels(completions: list, no_product_labels: bool) -> dict:
 
 
 def reformat_model_labels(entities: dict, no_product_labels: bool = False) -> dict:
-    
+    """
+        Convert the provided MODEL completions that match up with the proper tags
+       [DISH, RESTAURANT] and turn it into a more digestible form that can later be used for comparison.
+    """
     reformatted = {"DISH": [], "RESTAURANT": []}
     for ent_type in entities:
         if ent_type != "RESTAURANT" and ent_type != "DISH":
@@ -227,6 +234,7 @@ def evaluate_model(
     except (FileNotFoundError, json.JSONDecodeError) as e:
         logger.error(f"Failed to load eval file {eval_file_path}: {e}")
         return
+    
     logging.basicConfig(
         filename=os.path.join(eval_destination, "preds.log"),
         format="%(message)s",
@@ -237,6 +245,8 @@ def evaluate_model(
         # Load up the model
         model = FoodModel(model_path, no_product_labels=no_product_labels)
     except Exception as e:
+        # traceback.print_exception(e)
+        # traceback.print_exc()
         logger.error(f"Failed to load model {model_path}: {e}")
         return
     tags = ["DISH", "RESTAURANT"]
@@ -260,7 +270,7 @@ def evaluate_model(
             logger.error(f"Error processing example: {e}")
         
             # Add stack trace
-            # traceback.print_exception(e)
+            traceback.print_exception(e)
 
             continue
     perf_df = pd.DataFrame(judge_perf(perf_dict))
