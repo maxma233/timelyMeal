@@ -1,5 +1,5 @@
 import torch
-from transformers import DistilBertForTokenClassification, DistilBertTokenizerFast, pipeline
+from transformers import DistilBertForTokenClassification, DistilBertTokenizerFast, pipeline, BertTokenizerFast, BertForTokenClassification
 
 from prediction_exception import PredictionException 
 
@@ -12,13 +12,10 @@ def test_model(model_path, test_sentences, label_map=None):
         test_sentences (list): List of sentences to test (e.g., ["I ate a pizza and pasta."]).
         label_map (dict): Mapping of label IDs to tags (e.g., {0: 'B-DISH', 1: 'I-DISH', 2: 'O'}).
     """
-    # Default label map (assuming no_product_labels=True)
-    if label_map is None:
-        label_map = {0: 'B-DISH', 1: 'I-DISH', 2: 'O'}
 
     # Load tokenizer and model
-    tokenizer = DistilBertTokenizerFast.from_pretrained("distilbert-base-cased")
-    model = DistilBertForTokenClassification.from_pretrained(model_path)
+    tokenizer = BertTokenizerFast.from_pretrained("bert-base-cased")
+    model = BertForTokenClassification.from_pretrained(model_path)
     
     # Move model to GPU if available
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -28,7 +25,7 @@ def test_model(model_path, test_sentences, label_map=None):
     model.eval()
 
     # Create NER pipeline
-    ner_pipeline = pipeline("ner", model=model, tokenizer=tokenizer, device=0 if device == "cuda" else -1)
+    ner_pipeline = pipeline("ner", model=model, tokenizer=tokenizer, device="cuda" if torch.cuda.is_available() else "cpu")
 
     print(f"Testing model from {model_path} on {len(test_sentences)} sentences:")
     for sentence in test_sentences:
@@ -36,7 +33,6 @@ def test_model(model_path, test_sentences, label_map=None):
         predictions = ner_pipeline(sentence)
         
         # Process predictions
-        # tokens = tokenizer.convert_ids_to_tokens(tokenizer(sentence, return_offsets_mapping=True)["input_ids"])
         print("Token\tPredicted Tag")
         print("-" * 30)
         print('Predictions: ', predictions)
@@ -47,7 +43,7 @@ def test_model(model_path, test_sentences, label_map=None):
             score = pred["score"]
             print(f"{token}\t{label} ({score:.3f})")
         
-        # Group by entity
+            # Group by entity
         entities = []
         current_entity = []
         buffer = ""
@@ -55,19 +51,20 @@ def test_model(model_path, test_sentences, label_map=None):
         prev_label = None
         label = None
 
+        entity_label = ''
+
         # Dictionary containing the rules for how new words (not subwords)
         # can be attached to previous words
-        label_rule_book = { 'I': ['B', 'I'], 'B': [] }
+        label_rule_book = { 'I': ['B', 'I'], 'B': ['B'] }
 
         for pred in predictions:
             # Tracks the previous label
             if label:
                 prev_label = label
+                entity_label = pred['entity'][2:] if entity_label == '' else entity_label
 
             label = pred["entity"][:1]
             current_rule = label_rule_book[label] 
-            # print('Current rule: ', current_rule)
-            # print('is_subword', is_subword)
 
             # Push out buffer to new entities if a dish that is fully satisfied
             if (len(buffer) != 0 and (not is_subword and prev_label not in current_rule)):
@@ -80,14 +77,10 @@ def test_model(model_path, test_sentences, label_map=None):
                 # Reset the flag
                 is_subword = False
 
-            # print('Buffer: ', buffer)
-
             # GET NEW WORD
-
             # Check if it is a subword
             word_predicted = pred["word"]
             if (str.startswith(word_predicted, '##')):
-                # print('is a subword!')
                 is_subword = True
                 word_predicted = str.replace(word_predicted, '##', '')
 
@@ -98,39 +91,37 @@ def test_model(model_path, test_sentences, label_map=None):
                     raise PredictionException()
             except PredictionException as e:
                 print(e)
-                exit()
+
+                # Should not handle these cases
+                buffer = ''
+                is_subword = False
+                current_entity.clear()
+
+                break
+                # exit()
 
             current_entity = [word_predicted]
-            # print("Current entity: ", current_entity)
 
+            # Push out buffer if dish is fully completed before continuing
+            if not len(buffer) == 0 and (not is_subword and prev_label not in current_rule):
+                entities.append(buffer)
+                buffer = ""
+
+            # Append a new word (not subword) to the current dish in the buffer
             if not len(buffer) == 0 and (not is_subword and (prev_label in current_rule)):
-                # print('Appending new word onto current one (non subword)')
                 buffer += ' ' + current_entity.pop()
-
-                # print('buffer: ', buffer)
         
         # Final addition to the buffer and added to the entities 
         if (current_entity):
             buffer += current_entity.pop()
-        
-        # print('Final buffer state: ', buffer)
 
+        # Final buffer push 
         entities.append(buffer)
-        buffer = ""
-
-        # Final check (could have reached the end )
-        if not len(buffer) == 0 and not is_subword:
-            entities.append("".join(buffer))
-            buffer = ""
-
-        # if current_entity:
-        #     entities.append(" ".join(current_entity))
-
 
         print("\nExtracted DISH entities:", entities if entities else "None")
 
 if __name__ == "__main__":
-    model_path = "../models/culinaryBERT"
+    model_path = "../models/broad_model/culinaryBERT"
     test_sentences = [
         # "I ate a delicious pizza and pasta.",
         # "The restaurant serves sushi and ramen.",
@@ -172,15 +163,15 @@ if __name__ == "__main__":
         # 'the pho broth was great',
         # 'one of my favorite things to eat is bun bo hue',
         # 'he missed eating some udon',
-        'i ordered waldorf salad for lunch .',
-        'she loves beet risotto with goat cheese .',
-        'i enjoyed tuna tataki by the coast .',
-        'we ordered methi naan with curry .',
-        'we had grilled lamb rack as the centerpiece .',
-        'we tried mushroom risotto at the bistro .',
-        'i ordered caprese salad for lunch .',
-        'he loves sushi rolls with soy sauce .',
-        'we had tandoori paneer tikka last night .',
+        # 'i ordered waldorf salad for lunch .',
+        # 'she loves beet risotto with goat cheese .',
+        # 'i enjoyed tuna tataki by the coast .',
+        # 'we ordered methi naan with curry .',
+        # 'we had grilled lamb rack as the centerpiece .',
+        # 'we tried mushroom risotto at the bistro .',
+        # 'i ordered caprese salad for lunch .',
+        # 'he loves sushi rolls with soy sauce .',
+        # 'we had tandoori paneer tikka last night .',
         # 'hamburger',
         # 'I enjoyed lunchables',
         # 'I want a taco',
@@ -198,8 +189,53 @@ if __name__ == "__main__":
         # 'sunday roast',
         # 'mac n cheese',
         # 'chocolate milkshake',
-        'my favorite things to eat are crab rangoons and also some french fries',
+        # 'my favorite things to eat are crab rangoons and also some french fries',
+        # 'she ate brazilian cheese bread for breakfast .',
+        # 'pepperoni pizza',
+        # 'grilled cheese',
+        # 'chicken alfredo',
+        # 'pho',
+        # 'beef ramen',
+        # 'fettuccine alfredo',
+        # 'meatloaf',
+        # 'sloppy joe',
+        # 'pulled pork sandwich',
+        # 'baked beans',
+        # 'cornbread',
+        # 'shrimp gumbo',
+        # 'cheeseburger',
+        # 'chicken biryani',
+        # 'thai curry',
+        # 'pad thai',
+        # 'kung pao chicken',
+        # 'apple pie',
+        # 'chocolate ice cream',
+        # 'steak',
+        # 'sushi',
+        # 'fried chicken',
+        # 'al pastor tacos', 
+        # 'scented candle',
+        # 'pencil graphite',
+        # 'wooden table',
+        # 'blow dryer',
+        # 'washing machine',
+        # 'water bottle',
+        # 'car engine',
+        # 'engine',
+        # 'dirt',
+        # 'nothing',
+        # "Chick-fil-A",
+        # "Burger King",
+        # "McDonald's",
+        # "Red Lobster",
+        # "Olive Garden",
+        # "Taco Bell",
+        # "White Castle",
+        # "Panda Express",
+        # "Sushi Bros", 
+        # "Hamburger",
     ]
-    label_map = {0: "B-DISH", 1: "I-DISH", 2: "O"}  # Matches no_product_labels=True
+    label_map = {0: "B-DISH", 1: "I-DISH", 2: "O", 3: "B-RESTAURANT", 4: "I-RESTAURANT"}  # Matches no_product_labels=True
 
-    test_model(model_path, list(map(lambda x: str.lower(x), test_sentences)), label_map)
+    # test_model(model_path, list(map(lambda x: str.lower(x), test_sentences)), label_map)
+    test_model(model_path, test_sentences, label_map)
