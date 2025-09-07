@@ -6,6 +6,11 @@ from pathlib import Path
 import os
 # import subprocess
 
+import nltk
+from nltk.corpus import stopwords
+
+STOP_WORDS = set(stopwords.words('english'))
+
 # Verifying and moving to correct location
 current_dir = Path(__file__).resolve().parent
 file_name_to_data = current_dir / 'timelymealsdiscreteannotated.csv'
@@ -30,6 +35,10 @@ def read_file(file_name: str) -> pd.DataFrame:
 
         # Tokenizing the input
         data['clean'] = data.text.apply(lambda x: x.lower().split())
+
+        data['stop_removed'] = [ [word for word in tokens if word not in STOP_WORDS] for tokens in data['clean'] ]
+        # data['clean_set'] = data.clean.apply(lambda x: set(x))
+        # data['stop_removed'] = data.clean_set.apply(lambda x: w for w in STOP_WORDS)
         data.drop(['c3', 'c4', 'c5'], axis=1, inplace=True)
     except FileNotFoundError as e:
         print(e)
@@ -72,7 +81,7 @@ def build_classifier_dict(data: pd.DataFrame) -> dict:
     for col_name in list(set(data.type)):
         sub_df = data[data.type == col_name]
         words_valid_invalid[col_name] = []
-        for row in sub_df.clean:
+        for row in sub_df['stop_removed']:
             for word in row:
                 words_valid_invalid[col_name].append(word)
         words_valid_invalid[col_name] = ctr(words_valid_invalid[col_name])
@@ -102,7 +111,7 @@ class Classifier:
 
         # Saved information for probability functions
         self.type_ctr = ctr(self.data.type)
-        self.words_ctr = ctr([word for row in self.data.clean for word in row])
+        self.words_ctr = ctr([word for row in self.data['stop_removed'] for word in row])
 
     def verify(self, prompt: str) -> int:
         """
@@ -130,7 +139,7 @@ class Classifier:
         self.valid_invalid_dict = build_classifier_dict(self.data)
 
         self.type_ctr = ctr(self.data.type)
-        self.words_ctr = ctr([word for row in self.data.clean for word in row])
+        self.words_ctr = ctr([word for row in self.data['stop_removed'] for word in row])
 
     def append(self, category: str, prompt: str) -> int:
         """
