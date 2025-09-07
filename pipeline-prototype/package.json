@@ -15,6 +15,8 @@
     "@expo/vector-icons": "^14.1.0",
     "@homielab/react-native-auto-scroll": "^0.0.10",
     "@react-native-community/slider": "^4.5.7",
+    "@react-navigation/native": "^7.1.17",
+    "@react-navigation/native-stack": "^7.3.25",
     "expo": "~53.0.11",
     "expo-status-bar": "~2.2.3",
     "hugeicons-react": "^0.3.0",
@@ -26,13 +28,17 @@
     "react-native-auto-scrolling": "^3.0.2",
     "react-native-bouncy-checkbox": "^4.1.2",
     "react-native-elements": "^3.4.3",
-    "react-native-page-indicator": "^2.4.2",
     "react-native-paper": "4.9.2",
-    "react-native-web": "^0.20.0"
+    "react-native-safe-area-context": "^5.6.0",
+    "react-native-screens": "^4.14.1",
+    "react-native-vector-icons": "^10.2.0",
+    "react-native-web": "^0.20.0",
+    "react-virtualized": "^9.22.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "typescript": "~5.8.3"
   },
   "private": true
 }
