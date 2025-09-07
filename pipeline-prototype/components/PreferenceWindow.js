@@ -17,7 +17,7 @@ function PreferenceWindow() {
 
         <View style={styles.container}>
             <PreferenceList />
-            <View style={styles.buttonContainer}>
+            <View style={{}}>
                 <Button
                     onPress={clickHandler}
                     title={"next"}
@@ -42,15 +42,15 @@ const styles = StyleSheet.create({
         // height: '100%',
 
     },
-    buttonContainer: {
-        zIndex: 10,
-        position: 'absolute',
-        top: 0,
-        right: '-5rem',
-        // right: '15%',
-        // bottom: '5%',
-        minWidth: 100,
-    },
+    // buttonContainer: {
+    //     zIndex: 10,
+    //     position: 'absolute',
+    //     top: 0,
+    //     right: '-5rem',
+    //     // right: '15%',
+    //     // bottom: '5%',
+    //     minWidth: 100,
+    // },
 })
 
 export default PreferenceWindow;
