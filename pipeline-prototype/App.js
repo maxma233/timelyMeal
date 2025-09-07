@@ -1,16 +1,40 @@
 import { Button, Text, SafeAreaView, StyleSheet, TextInput, View, Image } from 'react-native';
-import { useState } from 'react'
+import { useState, createContext } from 'react'
 import { Icon } from 'react-native-elements';
 import QuestionnaireWindow from './components/QuestionnaireWindow'
 import ImageScroller from './components/ImageScroller';
+import { createStaticNavigation } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 // You can import supported modules from npm
 import { Card } from 'react-native-paper';
 
 // or any files within the Snack
 import AssetExample from './components/AssetExample';
+import { color } from 'react-native-elements/dist/helpers';
+
+export const ButtonContext = createContext();
+
+const RootStack = createNativeStackNavigator({
+    screens: {
+        Home: {
+            screen: Home,
+            options: {
+              headerShown : false,
+            }
+        },
+        // Profile: {},
+    },
+    initialRoutName: "Home",
+});
+
+const Navigation = createStaticNavigation(RootStack);
 
 export default function App() {
+  return <Navigation />
+}
+
+function Home() {
   const [text, setText] = useState('');
   const [error, setError] = useState('');
 
@@ -132,86 +156,88 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.body}>
-      <div style={styles.navigation}>
+      <ButtonContext value={{ color: '#F44322'}}>
+        <div style={styles.navigation}>
 
-        {/* Add example logo here */}
-        <div style={{ display: 'flex', justifyContent: 'center', overflow: 'display' }}>
-          <Image source={require('./assets/logoplaceholder.jpg')} style={{ width: '50px', height: '50px' }}></Image>
+          {/* Add example logo here */}
+          <div style={{ display: 'flex', justifyContent: 'center', overflow: 'display' }}>
+            <Image source={require('./assets/logoplaceholder.jpg')} style={{ width: '50px', height: '50px' }}></Image>
 
-          <Text style={styles.paragraph}>
-            TimelyMeals
-          </Text>
+            <Text style={styles.paragraph}>
+              TimelyMeals
+            </Text>
+          </div>
+
+          <div>
+            <Text style={styles.naviElement}>
+              Link (Element)
+            </Text>
+            <Text style={styles.naviElement}>
+              Sign in with Google (Element)
+            </Text>
+          </div>
         </div>
 
-        <div>
-          <Text style={styles.naviElement}>
-            Link (Element)
-          </Text>
-          <Text style={styles.naviElement}>
-            Sign in with Google (Element)
-          </Text>
-        </div>
-      </div>
+        <View>
 
-      <View>
+          {/* Put image scroller here */}
+          <ImageScroller />
 
-        {/* Put image scroller here */}
-        <ImageScroller />
-
-      </View>
+        </View>
 
 
-      <div style={{ margin: 'auto', marginTop: '2vw' }}>
+        <div style={{ margin: 'auto', marginTop: '2vw' }}>
 
-        <QuestionnaireWindow />
+          <QuestionnaireWindow />
 
 
 
-        {/* <Text style={{ fontSize: '2.3rem', alignSelf: 'flex-start' }}>
-          What Would You Like to Eat?
-        </Text> */}
+          {/* <Text style={{ fontSize: '2.3rem', alignSelf: 'flex-start' }}>
+            What Would You Like to Eat?
+            </Text> */}
 
-        {/* <div style={{ display: 'flex', }}>
+          {/* <div style={{ display: 'flex', }}>
 
-          <TextInput
+            <TextInput
             placeholder='What would you like to eat?'
             placeholderTextColor={'#ccc'}
             style={styles.input}
             onChangeText={setText}
             value={text}
-          />
-          <button
+            />
+            <button
             style={styles.searchButton}
             onClick={handleSearch}>
             <Icon name="arrow-right" type="entypo" size={24} color="white" />
-          </button>
+            </button>
 
-        </div> */}
+          </div> */}
 
-        {/* <div
-          style={{ display: 'flex' }}>
-          <button
+          {/* <div
+            style={{ display: 'flex' }}>
+            <button
             style={{ ...styles.searchButton, ...styles.negativePromptButton }}
             onClick={() => {
               handleNewPrompt("Valid")
-            }}
-          >Should be valid</button>
-          <button
-            style={{ ...styles.searchButton, ...styles.positivePromptButton }}
-            onClick={() => {
-              handleNewPrompt("Invalid")
-            }}
-          >Should be invalid</button>
-        </div> */}
+              }}
+              >Should be valid</button>
+              <button
+              style={{ ...styles.searchButton, ...styles.positivePromptButton }}
+              onClick={() => {
+                handleNewPrompt("Invalid")
+                }}
+                >Should be invalid</button>
+                </div> */}
 
-        {
-          error !== '' && <Text style={{ color: '#FF0000' }}>
-            {error}
-          </Text>
-        }
+          {
+            error !== '' && <Text style={{ color: '#FF0000' }}>
+              {error}
+            </Text>
+          }
 
-      </div>
+        </div>
 
+      </ButtonContext>
     </SafeAreaView >
   );
 }
@@ -235,9 +261,9 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
-    justifyContent: 'flex-start',
+    justifyContent: 'flex',
     textAlign: 'left',
-    backgroundColor: '#F44322',
+    backgroundColor: '#FEF1EE',
     // textAlignVertical: 'bottom',
     padding: 8,
   },
