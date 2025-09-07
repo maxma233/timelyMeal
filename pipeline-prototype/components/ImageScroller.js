@@ -111,15 +111,32 @@ function ImageScroller() {
 
 function FoodImage({ name, item, index }) {
 
+    const DEFAULT_BORDER_COLOR = 'rgba(0, 0, 0, 0)';
+    const DEFAULT_BORDER_WIDTH = '0px'
+
     const title = name;
+    const [borderColor, setBorderColor] = useState(DEFAULT_BORDER_COLOR);
+    const [borderWidth, setBorderWidth] = useState(DEFAULT_BORDER_WIDTH);
 
     const clickHandler = (e) => {
         console.log(`Clicked on :${title}!`);
     }
 
     return (
-        <View>
-            <Pressable onPress={clickHandler}>
+        <View
+            style={{ borderColor: borderColor, borderWidth: borderWidth }}
+        >
+            <Pressable
+                onPress={clickHandler}
+            // onHoverIn={() => {
+            //     setBorderColor('#5c0');
+            //     setBorderWidth('1px');
+            // }}
+            // onHoverOut={() => {
+            //     setBorderColor(DEFAULT_BORDER_COLOR);
+            //     setBorderWidth(DEFAULT_BORDER_WIDTH);
+            // }}
+            >
                 <Image
                     style={styles.image}
                     source={item}
