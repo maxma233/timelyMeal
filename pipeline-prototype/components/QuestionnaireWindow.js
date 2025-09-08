@@ -10,6 +10,7 @@ import { PageIndicator } from './PageIndicator/PageIndicator';
 import ScheduleSelector from "./ScheduleSelector";
 import QuestionBlock from "./QuestionBlock";
 import DataChecker from './DataChecker';
+import OverviewPage from "./OverviewPage";
 
 export const LocationContext = createContext();
 export const QuestionnaireContext = createContext();
@@ -17,15 +18,15 @@ export const BeadThemeContext = createContext();
 
 export const DEFAULT_QUESTIONNAIRE = [
     [
-        { question: 'Type of Food:', component: <FoodTypeSelector />, checkFor: ["foodType"] }, 
-        { question: 'Duration (Days)?', component: <DurationSelector />, checkFor: ["duration"] },
-        { question: 'Meals per day?', component: <MealSelector />, checkFor: ["numMeals"] },
+        { questions: ['Type of Food:'], component: <FoodTypeSelector />, checkFor: ["foodType"] }, 
+        { questions: ['Duration (Days)?'], component: <DurationSelector />, checkFor: ["duration"] },
+        { questions: ['Meals per day?'], component: <MealSelector />, checkFor: ["numMeals"] },
     ],
     [
-        { question: 'Preferences?', component: <PreferenceWindow />, checkFor: ["preferences", "ethnicCuisines"] }
+        { questions: ['Preferences?'], component: <PreferenceWindow />, checkFor: ["preferences", "ethnicCuisines"] }
     ],
     [
-        { question: 'What are you craving?', component: <CravingWindow />, checkFor: [["preferences", "dishes"], ["preferences", "restaurants"]] }
+        { questions: ['Cravings?', 'Restaurant names?'], component: <CravingWindow />, checkFor: [["preferences", "dishes"], ["preferences", "restaurants"]] }
     ],
     // 'What is the budget?',
     // 'Do you need help scheduling?'
@@ -40,19 +41,12 @@ const DEFAULT_QUESTIONNAIRE_DATA_STATE = {
 
 function QuestionnaireWindow() {
     
-    const [locationVal, setLocationVal] = useState(0);
+    const [locationVal, setLocationVal] = useState(2);
     const [questionnaireData, setQuestionnaireData] = useState(DEFAULT_QUESTIONNAIRE_DATA_STATE);
     const [indicatorBeads, setIndicatorBeads] = useState(new Array(DEFAULT_QUESTIONNAIRE.length).fill("#333"));
 
     useEffect(() => {
         console.log("Questionnaire Data", questionnaireData)
-
-
-
-
-
-
-
     }, [questionnaireData]);
 
     return (
@@ -62,11 +56,12 @@ function QuestionnaireWindow() {
                 <LocationContext value={{ locationVal, setLocationVal }}>
                     <QuestionnaireContext value={{ questionnaireData, setQuestionnaireData }}>
                         <BeadThemeContext value={{ indicatorBeads, setIndicatorBeads }}>
-                            <DataChecker questions={DEFAULT_QUESTIONNAIRE[locationVal]}/>
+                            {locationVal < DEFAULT_QUESTIONNAIRE.length && <DataChecker questions={DEFAULT_QUESTIONNAIRE[locationVal]}/>}
                             <View style={{ alignSelf: 'center', display: 'flex', position: 'relative', flexDirection: 'row', gap: '20px' }}>
                                 <View style={{width: 'fit-content', position: 'absolute', left: '-5rem', top: 0, display: 'flex', flexDirection: 'row'}}>
                                 </View>
-
+                                
+                                {locationVal < DEFAULT_QUESTIONNAIRE.length ? 
                                     <View style={{ display: 'flex', flexDirection: 'col', gap: '20px', margin: 'auto', width: '100%', justifyContent: 'space-evenly' }}>
                                         <View style={{ display: 'flex', flexDirection: 'row', gap: '10px', justifyContent: 'center' }}>
                                             <NavButton direction="left"/>
@@ -75,7 +70,10 @@ function QuestionnaireWindow() {
                                         </View>
                                         <QuestionBlock questions={DEFAULT_QUESTIONNAIRE[locationVal]} />
                                     </View>
-
+                                :     
+                                    <OverviewPage />
+                                }
+                                    
                             </View>
                         </BeadThemeContext>
                     </QuestionnaireContext>
