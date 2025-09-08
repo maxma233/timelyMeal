@@ -35,21 +35,27 @@ function CravingWindow() {
     const { locationVal, setLocationVal } = useContext(LocationContext);
     const { questionnaireData, setQuestionnaireData } = useContext(QuestionnaireContext);
     
+    const getRandomId = () => {
+        return Math.floor(Math.random() * 1000000);
+    }
+
     useEffect(() => {
 
         const keys = Object.keys(questionnaireData.preferences);
-        const recreatedDishes = { dishes: [], restaurants: [] };
+        const recreatedDishes = new Object({ dishes: [], restaurants: [] });
         const typeDictionary = { 'dishes': 'DISH', 'restaurants': 'RESTAURANT'};
 
         for (const key of keys) {
-            questionnaireData.preferences[key].map((item, index) => {
-                const newItem = {
-                    id: Date.now().toString(),
-                    name: item,
-                    type: typeDictionary[key]
-                };
-                recreatedDishes[key].push(newItem);
-            })
+            if (recreatedDishes[key] && Array.isArray(recreatedDishes[key])) {
+                questionnaireData.preferences[key].map((item, index) => {
+                    const newItem = {
+                        id: getRandomId(),
+                        name: item,
+                        type: typeDictionary[key]
+                    };
+                    recreatedDishes[key].push(newItem);
+                })
+            }
         }
 
         setShoppingCart({...recreatedDishes});
@@ -79,9 +85,10 @@ function CravingWindow() {
 
 
         const keys = Object.keys(shoppingCart);
-        const normalizedData = { dishes: [], restaurants: [] };
+        const normalizedData = new Object({ dishes: [], restaurants: [] });
 
         for (const key of keys) {
+            
             shoppingCart[key].map((item, index) => {
                 normalizedData[key].push(item.name);
             });
@@ -186,7 +193,7 @@ function CravingWindow() {
             if (Array.isArray(items)) {
                 items.forEach(element => {
                     const newItem = {
-                        id: Date.now().toString(),
+                        id: getRandomId(),
                         name: element,
                         type: tag
                     };

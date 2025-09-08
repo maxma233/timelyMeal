@@ -41,7 +41,7 @@ const DEFAULT_QUESTIONNAIRE_DATA_STATE = {
 
 function QuestionnaireWindow() {
     
-    const [locationVal, setLocationVal] = useState(2);
+    const [locationVal, setLocationVal] = useState(0);
     const [questionnaireData, setQuestionnaireData] = useState(DEFAULT_QUESTIONNAIRE_DATA_STATE);
     const [indicatorBeads, setIndicatorBeads] = useState(new Array(DEFAULT_QUESTIONNAIRE.length).fill("#333"));
 
