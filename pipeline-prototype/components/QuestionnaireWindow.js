@@ -39,7 +39,7 @@ const DEFAULT_QUESTIONNAIRE_DATA_STATE = {
         preferences: { ethnicCuisines: [], dishes: [], restaurants: [] },
     };
 
-function QuestionnaireWindow() {
+function QuestionnaireWindow({ setIsLoadingPlanRequest }) {
     
     const [locationVal, setLocationVal] = useState(0);
     const [questionnaireData, setQuestionnaireData] = useState(DEFAULT_QUESTIONNAIRE_DATA_STATE);
@@ -49,6 +49,10 @@ function QuestionnaireWindow() {
         console.log("Questionnaire Data", questionnaireData)
     }, [questionnaireData]);
 
+    // useEffect(() => {
+    //     if (setIsLoadingPlanRequest) console.log('setIsLoadingPlanRequest prop received');
+    // }, [setIsLoadingPlanRequest]);
+
     return (
         <View style={{ width: '75vw' }}>
             <View>
@@ -57,7 +61,10 @@ function QuestionnaireWindow() {
                     <QuestionnaireContext value={{ questionnaireData, setQuestionnaireData }}>
                         <BeadThemeContext value={{ indicatorBeads, setIndicatorBeads }}>
                             {locationVal < DEFAULT_QUESTIONNAIRE.length && <DataChecker questions={DEFAULT_QUESTIONNAIRE[locationVal]}/>}
-                            <View style={{ alignSelf: 'center', display: 'flex', position: 'relative', flexDirection: 'row', gap: '20px' }}>
+                            <View 
+                                // className='self-center flex relative flex-row gap-[20px]'
+                                style={{ alignSelf: 'center', display: 'flex', position: 'relative', flexDirection: 'row', gap: '20px' }}
+                            >
                                 <View style={{width: 'fit-content', position: 'absolute', left: '-5rem', top: 0, display: 'flex', flexDirection: 'row'}}>
                                 </View>
                                 
@@ -71,7 +78,7 @@ function QuestionnaireWindow() {
                                         <QuestionBlock questions={DEFAULT_QUESTIONNAIRE[locationVal]} />
                                     </View>
                                 :     
-                                    <OverviewPage />
+                                    <OverviewPage setIsLoadingPlanRequest={setIsLoadingPlanRequest} />
                                 }
                                     
                             </View>
