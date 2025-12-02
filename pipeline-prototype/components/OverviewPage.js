@@ -1,9 +1,9 @@
 import React, { useContext, useRef, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { DEFAULT_QUESTIONNAIRE, QuestionnaireContext, LocationContext } from './QuestionnaireWindow.js';
-import { Header } from 'react-native-elements';
+import { Button, Header } from 'react-native-elements';
 
-function OverviewPage() {
+function OverviewPage({ setIsLoadingPlanRequest }) {
 
     const { questionnaireData, setQuestionnaireData } = useContext(QuestionnaireContext);
     const { locationVal, setLocationVal } = useContext(LocationContext);
@@ -128,6 +128,17 @@ function OverviewPage() {
                     })}
                     
                 </View>
+
+                <Button 
+                    style={styles.submitButton}
+                    color='#c63e26ff'
+                    title = "Sent to Model"
+                    onPress = {() => {
+                        console.log("Sending data to model...", questionnaireData);
+                        setIsLoadingPlanRequest(true);
+                    }}
+                />
+
             </View>
         </>
     );
@@ -135,7 +146,9 @@ function OverviewPage() {
 }
 
 const styles = StyleSheet.create({
-
+    submitButton: {
+        width: '80%',
+    },
     container:{
         flex: 1,
         padding:20,
