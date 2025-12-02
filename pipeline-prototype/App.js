@@ -1,7 +1,8 @@
 import { Button, Text, SafeAreaView, StyleSheet, TextInput, View, Image } from 'react-native';
-import { useState, createContext } from 'react'
+import { useState, createContext, useEffect } from 'react'
 import { Icon } from 'react-native-elements';
 import QuestionnaireWindow from './components/QuestionnaireWindow'
+import LoadingScreen from './components/LoadingScreen.js';
 import ImageScroller from './components/ImageScroller';
 import { createStaticNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -35,90 +36,96 @@ export default function App() {
 }
 
 function Home() {
+
   const [text, setText] = useState('');
   const [error, setError] = useState('');
+  const [isLoadingPlanRequest, setIsLoadingPlanRequest] = useState(null);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+
+  useEffect(() => {
+    if (isLoadingPlanRequest) {
+      console.log('is showing the loading screen!')
+    }
+  }, [isLoadingPlanRequest]);
 
   const resetError = () => {
     setError('');
   }
 
   const handleSearch = async () => {
-
     const currentTime = new Date();
 
     resetError();
 
+    // start loader
+    setIsLoadingPlanRequest(true);
+    setLoadingProgress(5);
+
     if (text.length === 0 || !text.trim()) {
       console.log("Empty search text");
+      setIsLoadingPlanRequest(false);
+      setLoadingProgress(0);
       return;
     }
 
-    // const form = new FormData();
-    // form.append("prompt", text);
+    try {
+      setLoadingProgress(20);
 
-    const response = await fetch('http://127.0.0.1:5000/prompt',
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+      const response = await fetch('http://127.0.0.1:5000/prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: text.trim() }),
       });
 
+      console.log(response);
 
-    console.log(response);
-
-    // ON BAD CASE: Update UI
-    if (!response.ok) {
-      setError(`Error: Invalid prompt!`);
-      console.log("Invalid prompt!");
-      return;
-      // throw new Error(`Server Error: ${response.status}`);
-    }
-
-    // Update UI to state valid case
-    const data = await response.json();
-    console.log("Valid prompt!");
-    console.log(`Request sent at: ${currentTime}`);
-
-    // Send request to the backend to prompt model
-
-    let output = undefined;
-
-    const modelRequest = await fetch('http://127.0.0.1:5000/model',
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ prompt: text.trim() })
+      if (!response.ok) {
+        setError(`Error: Invalid prompt!`);
+        console.log('Invalid prompt!');
+        setIsLoadingPlanRequest(false);
+        setLoadingProgress(0);
+        return;
       }
-    ).then(async (value) => {
-      output = await value.json()
-      const responseReceived = new Date()
 
-      console.log(`Output completed at: ${responseReceived}`)
-      console.log(`Time Elapsed: ${currentTime - responseReceived}`)
+      const data = await response.json();
+      console.log('Valid prompt!');
+      console.log(`Request sent at: ${currentTime}`);
 
-    }).catch(
-      (reason) => {
-        // Return an error instead
-        setError(`Error: ${reason}`);
-        // console.error(`Error: ${reason}`);
+      setLoadingProgress(45);
+
+      // model request
+      setLoadingProgress(60);
+      const modelResp = await fetch('http://127.0.0.1:5000/model', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: text.trim() }),
+      });
+
+      setLoadingProgress(80);
+
+      let output = undefined;
+      if (modelResp.ok) {
+        output = await modelResp.json();
+      } else {
+        setError(`Error: Model request failed (${modelResp.status})`);
       }
-    );
 
-    // // Something went wrong when trying to grab the model's output
-    if (!output) {
-      setError(`Error: Model output failed to instantiate!`);
-      // throw new Error("Model output failed to instantiate!");
+      if (!output) {
+        setError('Error: Model output failed to instantiate!');
+      }
+
+      console.log(output);
+
+      setLoadingProgress(100);
+      setTimeout(() => {
+        setIsLoadingPlanRequest(false);
+        setLoadingProgress(0);
+      }, 250);
+    } catch (err) {
+      setError(`Error: ${err}`);
+      setIsLoadingPlanRequest(false);
+      setLoadingProgress(0);
     }
-
-    // Update UI from the model output
-
-    console.log(output);
-
-    // console.log(data.message);
 
   }
 
@@ -178,21 +185,34 @@ function Home() {
           </div>
         </div>
 
-        <View>
+        {isLoadingPlanRequest ?
 
-          {/* Put image scroller here */}
-          <ImageScroller />
+          <LoadingScreen progress={loadingProgress} />
 
-        </View>
+          // <View>
+          //   <p>loading</p>
+          // </View>
+          :
+          <>
+            <View>
+
+              {/* Put image scroller here */}
+              <ImageScroller />
+
+            </View>
 
 
-        <div style={{ margin: 'auto', marginTop: '2vw' }}>
-
-          <QuestionnaireWindow />
+            <div style={{ margin: 'auto', marginTop: '2vw' }}>
 
 
+              {isLoadingPlanRequest ? 
+                <LoadingScreen progress={loadingProgress} />
+                :
+                <QuestionnaireWindow setIsLoadingPlanRequest={setIsLoadingPlanRequest} />
+              }
 
-          {/* <Text style={{ fontSize: '2.3rem', alignSelf: 'flex-start' }}>
+
+              {/* <Text style={{ fontSize: '2.3rem', alignSelf: 'flex-start' }}>
             What Would You Like to Eat?
             </Text> */}
 
@@ -229,13 +249,16 @@ function Home() {
                 >Should be invalid</button>
                 </div> */}
 
-          {
-            error !== '' && <Text style={{ color: '#FF0000' }}>
-              {error}
-            </Text>
-          }
+              {
+                
+                error !== '' && <Text style={{ color: '#FF0000' }}>
+                  {error}
+                </Text>
+              }
 
-        </div>
+            </div>
+          </>
+        }
 
       </ButtonContext>
     </SafeAreaView >
