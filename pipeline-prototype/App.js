@@ -1,90 +1,131 @@
 import { Button, Text, SafeAreaView, StyleSheet, TextInput, View, Image } from 'react-native';
-import { useState } from 'react'
+import { useState, createContext, useEffect } from 'react'
 import { Icon } from 'react-native-elements';
+import QuestionnaireWindow from './components/QuestionnaireWindow'
+import LoadingScreen from './components/LoadingScreen.js';
+import ImageScroller from './components/ImageScroller';
+import { createStaticNavigation } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 // You can import supported modules from npm
 import { Card } from 'react-native-paper';
 
 // or any files within the Snack
 import AssetExample from './components/AssetExample';
+import { color } from 'react-native-elements/dist/helpers';
+
+export const ButtonContext = createContext();
+
+const RootStack = createNativeStackNavigator({
+    screens: {
+        Home: {
+            screen: Home,
+            options: {
+              headerShown : false,
+            }
+        },
+        // Profile: {},
+    },
+    initialRoutName: "Home",
+});
+
+const Navigation = createStaticNavigation(RootStack);
 
 export default function App() {
+  return <Navigation />
+}
+
+function Home() {
+
   const [text, setText] = useState('');
   const [error, setError] = useState('');
+  const [isLoadingPlanRequest, setIsLoadingPlanRequest] = useState(null);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+
+  useEffect(() => {
+    if (isLoadingPlanRequest) {
+      console.log('is showing the loading screen!')
+    }
+  }, [isLoadingPlanRequest]);
 
   const resetError = () => {
     setError('');
   }
 
   const handleSearch = async () => {
+    const currentTime = new Date();
 
     resetError();
 
+    // start loader
+    setIsLoadingPlanRequest(true);
+    setLoadingProgress(5);
+
     if (text.length === 0 || !text.trim()) {
       console.log("Empty search text");
+      setIsLoadingPlanRequest(false);
+      setLoadingProgress(0);
       return;
     }
 
-    // const form = new FormData();
-    // form.append("prompt", text);
+    try {
+      setLoadingProgress(20);
 
-    const response = await fetch('http://127.0.0.1:5000/prompt',
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+      const response = await fetch('http://127.0.0.1:5000/prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: text.trim() }),
       });
 
+      console.log(response);
 
-    console.log(response);
-
-    // ON BAD CASE: Update UI
-    if (!response.ok) {
-      setError(`Error: Invalid prompt!`);
-      console.log("Invalid prompt!");
-      return;
-      // throw new Error(`Server Error: ${response.status}`);
-    }
-
-    // Update UI to state valid case
-    const data = await response.json();
-    console.log("Valid prompt!");
-
-    // Send request to the backend to prompt model
-
-    let output = undefined;
-
-    const modelRequest = await fetch('http://127.0.0.1:5000/model',
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ prompt: text.trim() })
+      if (!response.ok) {
+        setError(`Error: Invalid prompt!`);
+        console.log('Invalid prompt!');
+        setIsLoadingPlanRequest(false);
+        setLoadingProgress(0);
+        return;
       }
-    ).then(async (value) => {
-      output = await value.json()
-    }).catch(
-      (reason) => {
-        // Return an error instead
-        setError(`Error: ${reason}`);
-        console.error(`Error: ${reason}`);
+
+      const data = await response.json();
+      console.log('Valid prompt!');
+      console.log(`Request sent at: ${currentTime}`);
+
+      setLoadingProgress(45);
+
+      // model request
+      setLoadingProgress(60);
+      const modelResp = await fetch('http://127.0.0.1:5000/model', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: text.trim() }),
+      });
+
+      setLoadingProgress(80);
+
+      let output = undefined;
+      if (modelResp.ok) {
+        output = await modelResp.json();
+      } else {
+        setError(`Error: Model request failed (${modelResp.status})`);
       }
-    );
 
-    // // Something went wrong when trying to grab the model's output
-    if (!output) {
-      setError(`Error: Model output failed to instantiate!`);
-      throw new Error("Model output failed to instantiate!");
+      if (!output) {
+        setError('Error: Model output failed to instantiate!');
+      }
+
+      console.log(output);
+
+      setLoadingProgress(100);
+      setTimeout(() => {
+        setIsLoadingPlanRequest(false);
+        setLoadingProgress(0);
+      }, 250);
+    } catch (err) {
+      setError(`Error: ${err}`);
+      setIsLoadingPlanRequest(false);
+      setLoadingProgress(0);
     }
-
-    // Update UI from the model output
-
-    console.log(output);
-
-    // console.log(data.message);
 
   }
 
@@ -108,13 +149,13 @@ export default function App() {
       (reason) => {
         // Return an error instead
         setError(`Error: ${reason}`);
-        console.error(`Error: ${reason}`);
+        // console.error(`Error: ${reason}`);
       }
     );
 
     if (!output) {
       setError(`Error: Model output failed to instantiate!`);
-      throw new Error("Model output failed to instantiate!");
+      // throw new Error("Model output failed to instantiate!");
     }
 
     console.log("Successful appending to dataset!");
@@ -122,72 +163,104 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.body}>
-      <div style={styles.navigation}>
+      <ButtonContext value={{ color: '#F44322'}}>
+        <div style={styles.navigation}>
 
-        {/* Add example logo here */}
-        <div style={{ display: 'flex', justifyContent: 'center', overflow: 'display' }}>
-          <Image source={require('./assets/logoplaceholder.jpg')} style={{ width: '50px', height: '50px' }}></Image>
+          {/* Add example logo here */}
+          <div style={{ display: 'flex', justifyContent: 'center', overflow: 'display' }}>
+            <Image source={require('./assets/logoplaceholder.jpg')} style={{ width: '50px', height: '50px' }}></Image>
 
-          <Text style={styles.paragraph}>
-            TimelyMeals
-          </Text>
+            <Text style={styles.paragraph}>
+              TimelyMeals
+            </Text>
+          </div>
+
+          <div>
+            <Text style={styles.naviElement}>
+              Link (Element)
+            </Text>
+            <Text style={styles.naviElement}>
+              Sign in with Google (Element)
+            </Text>
+          </div>
         </div>
 
-        <div>
-          <Text style={styles.naviElement}>
-            Link (Element)
-          </Text>
-          <Text style={styles.naviElement}>
-            Sign in with Google (Element)
-          </Text>
-        </div>
-      </div>
-      <div style={{ margin: 'auto', marginTop: '10vw' }}>
-        <Text style={{ fontSize: '2.3rem', alignSelf: 'flex-start' }}>
-          What Would You Like to Eat?
-        </Text>
+        {isLoadingPlanRequest ?
 
-        <div style={{ display: 'flex', }}>
+          <LoadingScreen progress={loadingProgress} />
 
-          <TextInput
+          // <View>
+          //   <p>loading</p>
+          // </View>
+          :
+          <>
+            <View>
+
+              {/* Put image scroller here */}
+              <ImageScroller />
+
+            </View>
+
+
+            <div style={{ margin: 'auto', marginTop: '2vw' }}>
+
+
+              {isLoadingPlanRequest ? 
+                <LoadingScreen progress={loadingProgress} />
+                :
+                <QuestionnaireWindow setIsLoadingPlanRequest={setIsLoadingPlanRequest} />
+              }
+
+
+              {/* <Text style={{ fontSize: '2.3rem', alignSelf: 'flex-start' }}>
+            What Would You Like to Eat?
+            </Text> */}
+
+          {/* <div style={{ display: 'flex', }}>
+
+            <TextInput
             placeholder='What would you like to eat?'
             placeholderTextColor={'#ccc'}
             style={styles.input}
             onChangeText={setText}
             value={text}
-          />
-          <button
+            />
+            <button
             style={styles.searchButton}
             onClick={handleSearch}>
             <Icon name="arrow-right" type="entypo" size={24} color="white" />
-          </button>
+            </button>
 
-        </div>
+          </div> */}
 
-        <div
-          style={{ display: 'flex' }}>
-          <button
+          {/* <div
+            style={{ display: 'flex' }}>
+            <button
             style={{ ...styles.searchButton, ...styles.negativePromptButton }}
             onClick={() => {
               handleNewPrompt("Valid")
-            }}
-          >Should be valid</button>
-          <button
-            style={{ ...styles.searchButton, ...styles.positivePromptButton }}
-            onClick={() => {
-              handleNewPrompt("Invalid")
-            }}
-          >Should be invalid</button>
-        </div>
+              }}
+              >Should be valid</button>
+              <button
+              style={{ ...styles.searchButton, ...styles.positivePromptButton }}
+              onClick={() => {
+                handleNewPrompt("Invalid")
+                }}
+                >Should be invalid</button>
+                </div> */}
 
-        {
-          error !== '' && <Text style={{ color: '#FF0000' }}>
-            {error}
-          </Text>
+              {
+                
+                error !== '' && <Text style={{ color: '#FF0000' }}>
+                  {error}
+                </Text>
+              }
+
+            </div>
+          </>
         }
 
-      </div>
-
+      </ButtonContext>
     </SafeAreaView >
   );
 }
@@ -195,7 +268,7 @@ export default function App() {
 const styles = StyleSheet.create({
   navigation: {
     color: '#ffffff',
-    backgroundColor: '#ff4545',
+    backgroundColor: '#F44322',
     padding: '20px',
     display: 'flex',
     justifyContent: 'space-between',
@@ -211,9 +284,9 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
-    justifyContent: 'flex-start',
+    justifyContent: 'flex',
     textAlign: 'left',
-    backgroundColor: '#fef7ff',
+    backgroundColor: '#FEF1EE',
     // textAlignVertical: 'bottom',
     padding: 8,
   },

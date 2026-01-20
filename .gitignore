@@ -1,2 +1,7 @@
 pipeline-prototype/package-lock.json
 .env
+culinaryBERT/models
+culinaryBERT/data
+culinaryBERT/food_extractor/__pycache__
+*.txt
+*.pyc
