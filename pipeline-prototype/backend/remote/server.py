@@ -31,6 +31,31 @@ print('loading the pipeline!')
 pipe = pipeline("text-generation", model="timely/TimelyAI", device=device, torch_dtype=torch.bfloat16)
 print('pipeline ready!')
 
+
+def build_food_plan_prompt(user_input=None) -> str:
+
+    food_type = user_input['foodType']
+    duration = user_input['duration']
+    preferences = user_input['preferences']
+
+    ethnic_cuisines = preferences['ethnicCuisines'] or ['None']
+    dishes = preferences['dishes'] or []
+    restaurants = preferences['restaurants'] or []
+    
+    prompt = f'I want this meal plan to be {food_type} food lasting for {duration} days. '
+
+    if 'None' not in ethnic_cuisines:
+        # Cuisines need to be addressed
+        prompt += f'These dishes should be comprised of the {ethnic_cuisines} cuisines.'
+
+    if len(dishes) > 0:     
+        prompt += f' Some dishes I would like included are: {dishes}.'
+
+    if len(restaurants) > 0:
+        prompt += f' Some restaurants I would like included are: {restaurants}.'
+
+    return prompt
+
 @app.route('/prompt', methods=['POST'])
 def prompt_model():
     """ 
@@ -62,9 +87,9 @@ def prompt_model():
 
     if not prompt:
         return jsonify({"Error": "No prompt was sent to the backend"}), 400
-    
+
     # Build up the prompt
-    base_messages[1]['content'][0]['text'] = prompt + ' ' + base_messages[1]['content'][0]['text']
+    base_messages[1]['content'][0]['text'] = build_food_plan_prompt(user_input=prompt) + ' ' + base_messages[1]['content'][0]['text']
 
     print(base_messages)
 
