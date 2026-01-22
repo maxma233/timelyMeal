@@ -69,13 +69,13 @@ def prompt_model():
         {
             "role": "system",
             "content": [
-                {"type": "text", "text": "You are a meal planning assistant. Please do not provide recipes"}
+                {"type": "text", "text": "You are a meal planning assistant. Please do not provide recipes. Also, do not add any additional fluff text. Just return what is requested for."}
             ]
         },
         {
             "role": "user",
             "content": [
-                {"type": "text", "text": "Also, can you add the genre of food the dish is before you state the meal in parentheses (Ex: (Italian) Pasta Primavera)? Can you also list the quantity per dish in []? Choose decisive meals. Ex: Turkey Club as opposed to any sandwich."}
+                {"type": "text", "text": "Choose specific variant meals. Ex: Turkey Club as opposed to any sandwich."}
             ]
         }
     ]
