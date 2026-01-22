@@ -31,28 +31,39 @@ print('loading the pipeline!')
 pipe = pipeline("text-generation", model="timely/TimelyAI", device=device, torch_dtype=torch.bfloat16)
 print('pipeline ready!')
 
+def output_as_one_line(list=None) -> str:
+    
+    output = ''
+
+    for item in range(len(list) - 1):
+        output += f'{item}, '
+
+    output += list[len(list) - 1]
+
+    return output
 
 def build_food_plan_prompt(user_input=None) -> str:
 
     food_type = user_input['foodType']
     duration = user_input['duration']
+    num_meals = user_input['numMeals']
     preferences = user_input['preferences']
 
     ethnic_cuisines = preferences['ethnicCuisines'] or ['None']
     dishes = preferences['dishes'] or []
     restaurants = preferences['restaurants'] or []
     
-    prompt = f'I want this meal plan to be {food_type} food lasting for {duration} days. '
+    prompt = f'I want this meal plan to be {food_type} food lasting for {duration} days with each day having {num_meals} meals. '
 
     if 'None' not in ethnic_cuisines:
         # Cuisines need to be addressed
-        prompt += f'These dishes should be comprised of the {ethnic_cuisines} cuisines.'
+        prompt += f'These dishes should be comprised of the {output_as_one_line(list=ethnic_cuisines)} cuisines.'
 
     if len(dishes) > 0:     
-        prompt += f' Some dishes I would like included are: {dishes}.'
+        prompt += f" Some dishes I would like included are: {output_as_one_line(list=dishes)}, but don't focus on it heavily."
 
     if len(restaurants) > 0:
-        prompt += f' Some restaurants I would like included are: {restaurants}.'
+        prompt += f" Some restaurants I would like included are: {output_as_one_line(list=restaurants)}, but don't focus on it heavily."
 
     return prompt
 
