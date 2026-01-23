@@ -19,19 +19,19 @@ function QuantityInput({ quantity, setQuantity, onButtonDeletion }) {
 
     return (
         <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', alignSelf: 'center' }}>
-            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderColor: '#ccc', borderWidth: '2px', backgroundColor: '#eee', borderRadius: '5px' }}>
+            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderColor: '#ccc', borderWidth: 2, backgroundColor: '#eee', borderRadius: 6 }}>
                 <Pressable
                     onPress={quantity < 1 ? onButtonDeletion : decrement}
                     style={{ padding: 10, backgroundColor: '#f0f0f0', borderRadius: 5 }}
                 >
-                    <Icon name={quantity < 1 ? 'trash' : 'remove'} type="material" size={10} color="#333" />
+                    <Icon name={quantity < 1 ? 'trash' : 'remove'} type="material" size={16} color="#333" />
                 </Pressable>
                 <Text style={{ paddingRight: 10, paddingLeft: 10, backgroundColor: '#eee' }}>{quantity}</Text>
                 <Pressable
                     onPress={increment}
                     style={{ padding: 10, backgroundColor: '#f0f0f0', borderRadius: 5 }}
                 >
-                    <Icon name="add" type="material" size={10} color="#333" />
+                    <Icon name="add" type="material" size={16} color="#333" />
 
                 </Pressable>
 

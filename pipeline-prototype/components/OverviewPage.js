@@ -1,14 +1,15 @@
 import React, { useContext, useRef, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView, useWindowDimensions } from 'react-native';
 import { DEFAULT_QUESTIONNAIRE, QuestionnaireContext, LocationContext } from './QuestionnaireWindow.js';
-import { Button, Header } from 'react-native-elements';
+import { Button } from 'react-native-elements';
 
 function OverviewPage({ setIsLoadingPlanRequest }) {
 
-    const { questionnaireData, setQuestionnaireData } = useContext(QuestionnaireContext);
-    const { locationVal, setLocationVal } = useContext(LocationContext);
-    
-    const [loadedQuestions, setLoadedQuestions] = useState(false);
+    const { questionnaireData } = useContext(QuestionnaireContext);
+    const { setLocationVal } = useContext(LocationContext);
+
+    const { width } = useWindowDimensions();
+    const titleSize = Math.max(22, Math.min(34, Math.round(width * 0.065)));
     
     const surveyQuestions = useRef(null);
 
@@ -29,7 +30,6 @@ function OverviewPage({ setIsLoadingPlanRequest }) {
         }
 
         surveyQuestions.current = [...listOfQuestions];
-        setLoadedQuestions(true);
 
     }, [])
 
@@ -48,22 +48,16 @@ function OverviewPage({ setIsLoadingPlanRequest }) {
                 containerStyle={styles.headerContainer}
             /> */}
 
-            <View
-                style={{ display: 'flex', flexDirection: 'column', textAlign: 'left'}}
-            >
+            <ScrollView contentContainerStyle={styles.container}>
 
                 <Text
-                    style={{ 
-                        fontSize: '4rem',
-                        fontWeight: '400',
-                        fontFamily: 'arial',
-                    }}
+                    style={[styles.title, { fontSize: titleSize }]}
                 >
                     Overview of Food Plan
                 </Text>
             
                 <View
-                    style={{ display: 'flex', flexDirection: 'column', fontSize: '2rem', gap: '1rem' }}
+                    style={styles.list}
                 >
 
                     {Object.keys(questionnaireData).map((keyValue, index) => {
@@ -71,7 +65,7 @@ function OverviewPage({ setIsLoadingPlanRequest }) {
                             return (
                                 <View
                                     key={`${keyValue}${index}`}
-                                    style={{ display: 'inherit', flexDirection: 'inherit', gap: 'inherit' }}                    
+                                    style={styles.nestedGroup}
                                 >
                                     {Object.keys(questionnaireData[keyValue]).map((nestedKeyValue, index) => {
                                         
@@ -91,8 +85,9 @@ function OverviewPage({ setIsLoadingPlanRequest }) {
                                                         console.log(`Pressed question: question: ${questionObject['question']}, locationIndex: ${questionIndex}`);
                                                         setLocationVal(questionIndex);
                                                     }}
+                                                    style={styles.rowPressable}
                                                 >
-                                                    <Text style ={{ fontSize: 'inherit'}}>
+                                                    <Text style={styles.rowText}>
                                                         {questionObject['question']} {valueIsPopulated ? questionnaireData[keyValue][nestedKeyValue].join(', ') : 'Nothing Selected'}
                                                     </Text>
                                                 </Pressable>
@@ -112,12 +107,14 @@ function OverviewPage({ setIsLoadingPlanRequest }) {
                                 <View
                                 key={`${keyValue}${index}`}
                                 >
-                                    <Pressable onPress={() => {
+                                    <Pressable
+                                        style={styles.rowPressable}
+                                        onPress={() => {
                                         console.log(`Pressed question: ${keyValue}`)
                                         setLocationVal(questionIndex)        
                                     }}>
                                         <Text
-                                            style={{ fontSize: 'inherit '}}
+                                            style={styles.rowText}
                                         >
                                             {questionObject['question']} {questionnaireData[keyValue] ? (Array.isArray(questionnaireData[keyValue]) ? questionnaireData[keyValue].map(item => item.name).join(', ') : questionnaireData[keyValue]) : 'Nothing Selected'}
                                         </Text>
@@ -139,33 +136,46 @@ function OverviewPage({ setIsLoadingPlanRequest }) {
                     }}
                 />
 
-            </View>
+            </ScrollView>
         </>
     );
 
 }
 
 const styles = StyleSheet.create({
+    container: {
+        width: '100%',
+        paddingVertical: 8,
+        paddingHorizontal: 4,
+        gap: 14,
+    },
+    title: {
+        fontWeight: '600',
+        color: '#000',
+    },
+    list: {
+        width: '100%',
+        gap: 10,
+    },
+    nestedGroup: {
+        width: '100%',
+        gap: 10,
+    },
+    rowPressable: {
+        paddingVertical: 10,
+        paddingHorizontal: 10,
+        borderRadius: 12,
+        backgroundColor: '#FFF',
+    },
+    rowText: {
+        fontSize: 16,
+        color: '#000',
+    },
     submitButton: {
         width: '80%',
-    },
-    container:{
-        flex: 1,
-        padding:20,
-    },
-    title:{
-        fontSize:20,
-        // width: 'fit-content',
-        fontWeight: 'bold',
         alignSelf: 'center',
-        color: '#FFF',
+        marginTop: 8,
     },
-    headerContainer:{
-         backgroundColor: '#007bff',  
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
 });
 
 export default OverviewPage;

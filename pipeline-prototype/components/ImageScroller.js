@@ -19,7 +19,7 @@ const IMAGE_NAMES = ['burger', 'friedChicken', 'pasta', 'pizza', 'ramen', 'sandw
 const IMAGE_SOURCES_2 = [...IMAGE_SOURCES];
 const IMAGE_NAMES_2 = [...IMAGE_NAMES];
 
-DEFAULT_DELAY = 8000;
+const DEFAULT_DELAY = 8000;
 
 
 function ImageScroller() {
@@ -47,7 +47,7 @@ function ImageScroller() {
 
     const loadImageList = () => {
         return (
-            <View style={{ display: 'flex', flexDirection: 'row', borderTopWidth: '4px', borderBottomWidth: '4px', borderColor: '#000' }}>
+            <View style={{ display: 'flex', flexDirection: 'row', borderTopWidth: 4, borderBottomWidth: 4, borderColor: '#000' }}>
                 {/* First Scroller */}
                 {IMAGE_SOURCES.map((item, index) => {
                     return (
@@ -112,7 +112,7 @@ function ImageScroller() {
 function FoodImage({ name, item, index }) {
 
     const DEFAULT_BORDER_COLOR = 'rgba(0, 0, 0, 0)';
-    const DEFAULT_BORDER_WIDTH = '0px'
+    const DEFAULT_BORDER_WIDTH = 0;
 
     const title = name;
     const [borderColor, setBorderColor] = useState(DEFAULT_BORDER_COLOR);
