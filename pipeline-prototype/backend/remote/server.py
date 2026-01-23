@@ -53,19 +53,34 @@ def build_food_plan_prompt(user_input=None) -> str:
     dishes = preferences['dishes'] or []
     restaurants = preferences['restaurants'] or []
     
-    prompt = f'I want this meal plan to be {food_type} food lasting for {duration} days with each day having {num_meals} meals. '
+    prompt_requirements = ''
 
-    if 'None' not in ethnic_cuisines:
-        # Cuisines need to be addressed
-        prompt += f'These dishes should be comprised of the {output_as_one_line(list=ethnic_cuisines)} cuisines.'
+    # Length of plan and number of meals
+    prompt_requirements += f'Create a 7-day {food_type} meal plan with {num_meals} per day.\n'
 
-    if len(dishes) > 0:     
-        prompt += f" Some dishes I would like included are: {output_as_one_line(list=dishes)}, but don't focus on it heavily."
+    # Requirement List
+    prompt_requirements += 'Requirements:\n'
+    prompt_requirements += f'• Meals must be {output_as_one_line(list=ethnic_cuisines)} cuisine only.\n'
 
-    if len(restaurants) > 0:
-        prompt += f" Some restaurants I would like included are: {output_as_one_line(list=restaurants)}, but don't focus on it heavily."
+    for dish in dishes:
+        prompt_requirements += f'Include {dish} at least once.\n'
 
-    return prompt
+    for restaurant in restaurants:
+        prompt_requirements += f'Include food from {restaurant} at least once.\n'
+
+    prompt_requirements += '''
+    • Each meal must be a specific menu item (example: “Carne Asada Tacos” instead of “tacos”).
+    • Meals should be realistic takeout items from restaurants or fast-casual places.
+
+    Output format:
+    • Label each day (Day 1–Day 7).
+    • List Breakfast, Lunch, Dinner for each day.
+    • Do not include explanations, summaries, or extra commentary.
+
+    Keep descriptions short and clear.
+    '''
+
+    return prompt_requirements
 
 @app.route('/prompt', methods=['POST'])
 def prompt_model():
@@ -102,25 +117,16 @@ def prompt_model():
     # Build up the prompt
     base_messages[1]['content'][0]['text'] = build_food_plan_prompt(user_input=prompt) + ' ' + base_messages[1]['content'][0]['text']
 
-    print(base_messages)
+    # print(base_messages)
 
-    # start_time = t.perf_counter()
-    # print(f'Start time: {t.perf_counter() - start_time} seconds')
-    
     # Call the model
     output = pipe(text_inputs=base_messages, max_new_tokens=500)
     
     model_response = output[0]["generated_text"][-1]["content"]
 
-    print(model_response)
+    # print(model_response)
 
     return jsonify({"Message": model_response}), 200
-    # return jsonify({"Message": 'good job'}), 200
-    
-    # end_time = t.perf_counter() - start_time
-    # print(end_time)
-    
-    # print('Ending time: {:2.2} seconds'.format(end_time))
 
 ## Run the backend from a portforwarded port
 if __name__ == "__main__":
