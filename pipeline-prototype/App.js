@@ -1,4 +1,4 @@
-import { Button, Text, SafeAreaView, StyleSheet, TextInput, View, Image } from 'react-native';
+import { Button, Text, SafeAreaView, StyleSheet, TextInput, View, Image, Pressable, ScrollView } from 'react-native';
 import { useState, createContext, useEffect } from 'react'
 import { Icon } from 'react-native-elements';
 import QuestionnaireWindow from './components/QuestionnaireWindow'
@@ -163,27 +163,27 @@ function Home() {
 
   return (
     <SafeAreaView style={styles.body}>
-      <ButtonContext value={{ color: '#F44322'}}>
-        <div style={styles.navigation}>
+      <ButtonContext.Provider value={{ color: '#F44322' }}>
+        <View style={styles.navigation}>
 
           {/* Add example logo here */}
-          <div style={{ display: 'flex', justifyContent: 'center', overflow: 'display' }}>
-            <Image source={require('./assets/logoplaceholder.jpg')} style={{ width: '50px', height: '50px' }}></Image>
+          <View style={styles.brand}>
+            <Image source={require('./assets/logoplaceholder.jpg')} style={styles.logo} />
 
             <Text style={styles.paragraph}>
               TimelyMeals
             </Text>
-          </div>
+          </View>
 
-          <div>
+          <View style={styles.navLinks}>
             <Text style={styles.naviElement}>
               Link (Element)
             </Text>
             <Text style={styles.naviElement}>
               Sign in with Google (Element)
             </Text>
-          </div>
-        </div>
+          </View>
+        </View>
 
         {isLoadingPlanRequest ?
 
@@ -202,7 +202,7 @@ function Home() {
             </View>
 
 
-            <div style={{ margin: 'auto', marginTop: '2vw' }}>
+            <ScrollView contentContainerStyle={styles.content}>
 
 
               {isLoadingPlanRequest ? 
@@ -256,11 +256,11 @@ function Home() {
                 </Text>
               }
 
-            </div>
+            </ScrollView>
           </>
         }
 
-      </ButtonContext>
+      </ButtonContext.Provider>
     </SafeAreaView >
   );
 }
@@ -269,25 +269,37 @@ const styles = StyleSheet.create({
   navigation: {
     color: '#ffffff',
     backgroundColor: '#F44322',
-    padding: '20px',
-    display: 'flex',
+    padding: 16,
+    flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'center',
+  },
+  brand: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  logo: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+  },
+  navLinks: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
   naviElement: {
-    padding: '5px',
-    marginHorizontal: '5px',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
     backgroundColor: '#ffffff',
-    borderRadius: '6px',
-    borderWidth: '2px',
+    borderRadius: 6,
+    borderWidth: 2,
     borderColor: '#000000',
   },
   body: {
     flex: 1,
-    justifyContent: 'flex',
-    textAlign: 'left',
     backgroundColor: '#FEF1EE',
-    // textAlignVertical: 'bottom',
     padding: 8,
   },
   // container: {
@@ -301,19 +313,26 @@ const styles = StyleSheet.create({
     // justifyContent: 'flex-start',
     // margin: 24,
     color: '#ffffff',
-    marginHorizontal: '24px',
+    marginHorizontal: 12,
     fontSize: 24,
     alignSelf: 'center',
     fontWeight: 'bold',
     // textAlign: 'center',
   },
+  content: {
+    width: '100%',
+    alignSelf: 'center',
+    paddingVertical: 16,
+    maxWidth: 900,
+    gap: 16,
+  },
   input: {
-    width: '40vw',
+    width: '100%',
     height: 40,
     // margin: 'auto',
-    borderRadius: '10px',
+    borderRadius: 10,
     // marginLeft: 'auto',
-    marginVertical: '10px',
+    marginVertical: 10,
     borderWidth: 2,
     padding: 10,
   },
@@ -322,12 +341,12 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     margin: 3,
-    paddingLeft: '10px',
+    paddingLeft: 10,
     alignSelf: 'center',
     backgroundColor: '#ff0000',
-    borderRadius: '10px',
+    borderRadius: 10,
     borderColor: '#000',
-    borderWidth: '2px',
+    borderWidth: 2,
   },
   negativePromptButton: {
     width: 80,

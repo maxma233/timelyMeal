@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useContext, createContext, useCallback } from 'react';
-import { View, StyleSheet, TextInput, Button, Pressable, Image, Animated, Text, VirtualizedList } from 'react-native';
+import { View, StyleSheet, TextInput, Button, Pressable, Animated, Text, VirtualizedList, Platform, useWindowDimensions } from 'react-native';
 import { ShoppingBasket03Icon, ListViewIcon, AddToListIcon } from 'hugeicons-react';
 import { List } from '../assets/images.js';
 import ListTransition from '../components/ListTransition.js';
@@ -23,6 +23,10 @@ function CravingWindow() {
     const [newDish, setNewDish] = useState({ id: undefined, name: undefined, type: undefined });
     const [newRestaurant, setNewRestaurant] = useState({ id: undefined, name: undefined, type: undefined });
     const animatedValue = useRef(new Animated.Value(0)).current;
+
+    const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+    const drawerWidth = Math.min(360, Math.max(280, screenWidth - 24));
+    const drawerHeight = Math.min(520, Math.max(340, Math.round(screenHeight * 0.7)));
 
     const [listHeight, setListHeight] = useState(0);
     // const ref = useRef(null);
@@ -221,14 +225,22 @@ function CravingWindow() {
                         onPress={() => { setListSelect('dishes') }}
                     >
                         {/* Type notification */}
-                        {questionnaireData.preferences.dishes.length != 0 && <Text style={{ position: 'absolute', top: 0, right: 0, zIndex: 1, backgroundColor: '#F44322', borderRadius: '40px', color: '#FFF', width: '20px', textAlign: 'center', aspectRatio: 1 / 1, }}>{questionnaireData.preferences.dishes.length}</Text>}
-                        <Text style={{ fontSize: '1.5rem', flex: 1, paddingHorizontal: '25px', textAlign: 'center', backgroundColor: DISH_LIST_COLOR, borderTopLeftRadius: '24px', borderTopRightRadius: '24px' }}>Dishes</Text>
+                        {questionnaireData.preferences.dishes.length != 0 && (
+                            <Text style={styles.badge}>
+                                {questionnaireData.preferences.dishes.length}
+                            </Text>
+                        )}
+                        <Text style={[styles.tab, styles.tabLeft, { backgroundColor: DISH_LIST_COLOR }]}>Dishes</Text>
                     </Pressable>
                     <Pressable
                         onPress={() => { setListSelect('restaurants') }}
                     >
-                        {questionnaireData.preferences.restaurants.length != 0 && <Text style={{ position: 'absolute', top: 0, right: 0, zIndex: 1, backgroundColor: '#F44322', borderRadius: '40px', color: '#FFF', width: '20px', textAlign: 'center', aspectRatio: 1 / 1, }}>{questionnaireData.preferences.restaurants.length}</Text>}
-                        <Text style={{ fontSize: '1.5rem', flex: 1, paddingHorizontal: '25px', textAlign: 'center', backgroundColor: RESTAURANT_LIST_COLOR, borderTopLeftRadius: '24px', borderTopRightRadius: '24px' }}>Restaurants</Text>
+                        {questionnaireData.preferences.restaurants.length != 0 && (
+                            <Text style={styles.badge}>
+                                {questionnaireData.preferences.restaurants.length}
+                            </Text>
+                        )}
+                        <Text style={[styles.tab, styles.tabRight, { backgroundColor: RESTAURANT_LIST_COLOR }]}>Restaurants</Text>
                     </Pressable>
                 </View>
                 <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', width: '100%', padding: 10, backgroundColor: list == 'dishes' ? DISH_LIST_COLOR : RESTAURANT_LIST_COLOR }}>
@@ -250,7 +262,7 @@ function CravingWindow() {
 
                     renderItem={({ item }) => (
                         <View
-                            style={{ fontSize: '1.2rem', padding: '10px', margin: 0, width: '100%' }}
+                            style={{ padding: 10, width: '100%' }}
                         >
                             <CravingListElement item={item} showQuantity={list == 'dishes' ? true : false} shoppingCart={shoppingCart} setShoppingCart={setShoppingCart} />
                         </View>
@@ -271,7 +283,7 @@ function CravingWindow() {
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
 
                 <TextInput
-                    style={{ padding: '20px', borderRightWidth: '1px', borderColor: '#000', }}
+                    style={styles.searchInput}
                     placeholder={"Chicken Alfredo"}
                     placeholderTextColor={'rgba(0, 0, 0, 0.5)'}
                     ref={searchRef}
@@ -309,7 +321,7 @@ function CravingWindow() {
                 </Button>
             </View>
 
-            <ElementContext value={{
+            <ElementContext.Provider value={{
                 listHeight,
                 setListHeight,
                 componentLoaded,
@@ -318,14 +330,14 @@ function CravingWindow() {
 
                 <ListTransition
                     style={{
-                        position: 'fixed',
+                        position: Platform.OS === 'web' ? 'fixed' : 'absolute',
                         bottom: 0,
-                        right: '20%',
+                        right: Platform.OS === 'web' ? '20%' : 12,
                         backgroundColor: 'powderblue',
                         borderRadius: 24,
                     }}>
                     <View
-                        style={{ width: 350, height: 500 }}
+                        style={{ width: drawerWidth, height: drawerHeight }}
                         ref={handleTransitionWindow}
                     >
                         <Pressable
@@ -341,7 +353,7 @@ function CravingWindow() {
                     </View>
                 </ListTransition>
 
-            </ElementContext>
+            </ElementContext.Provider>
 
         </View>
     );
@@ -418,5 +430,40 @@ const styles = StyleSheet.create({
     shoppingBag: {
         backgroundColor: 'transparent',
 
+    },
+    badge: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        zIndex: 1,
+        backgroundColor: '#F44322',
+        borderRadius: 20,
+        color: '#FFF',
+        width: 20,
+        height: 20,
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        lineHeight: 20,
+        overflow: 'hidden',
+    },
+    tab: {
+        fontSize: 18,
+        paddingHorizontal: 18,
+        paddingVertical: 10,
+        textAlign: 'center',
+        color: '#FFF',
+    },
+    tabLeft: {
+        borderTopLeftRadius: 24,
+    },
+    tabRight: {
+        borderTopRightRadius: 24,
+    },
+    searchInput: {
+        flex: 1,
+        paddingVertical: 12,
+        paddingHorizontal: 12,
+        borderRightWidth: Platform.OS === 'web' ? 1 : 0,
+        borderColor: '#000',
     },
 });

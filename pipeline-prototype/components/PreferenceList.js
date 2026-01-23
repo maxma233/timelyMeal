@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useRef, useContext} from "react";
 import { Button, Pressable, StyleSheet, Text, View, ScrollView } from "react-native";
-import BouncyCheckBox from "react-native-bouncy-checkbox";
 import BouncyButton from "./BouncyButton";
 import { TextInput } from "react-native-paper";
-import {LocationContext, QuestionnaireContext} from "./QuestionnaireWindow";
+import { QuestionnaireContext } from "./QuestionnaireWindow";
 import { ButtonContext } from "../App";
 
 const DEFAULT_NO_PREFERENCE_WORD = 'None';
@@ -103,7 +102,7 @@ function PreferenceList() {
     const loadList = () => {
 
         return (
-            <View style={{ gap: '2px', padding: '20px' }}>
+            <View style={styles.itemsContainer}>
                 {currentList.list.map((item, index) => (
                     <View key={index} style={{ display: "flex" }}>
                         <PressableButton
@@ -124,11 +123,11 @@ function PreferenceList() {
                 <Text>Hello! Add new preference here:</Text>
                 <TextInput
                     placeholder="Enter new cuisine type"
-                    style={{ marginBottom: '5px' }}
+                    style={{ marginBottom: 8 }}
                     value={itemName}
                     onChangeText={(value) => setItemName(value)}
                 />
-                <View style={{ display: "flex", gap: '2px', width: '75%', alignSelf: 'center' }}>
+                <View style={styles.popOutButtons}>
                     <Button
                         title="Close"
                         color={parentButtonContext.color}
@@ -159,7 +158,7 @@ function PreferenceList() {
 
             </ScrollView>
             {!showAddWindow &&
-                <View style={{ width: 'fit-content', alignSelf: 'center' }}>
+                <View style={{ alignSelf: 'center' }}>
                     <Button
                         title={"custom preference"}
                         color={parentButtonContext.color}
@@ -209,13 +208,25 @@ function PressableButton(PreferenceProps) {
 
 const styles = StyleSheet.create({
     popOutWindow: {
-        width: '50%',
+        width: '100%',
+        maxWidth: 420,
         alignSelf: 'center',
+        paddingVertical: 10,
+    },
+    popOutButtons: {
+        width: '100%',
+        maxWidth: 260,
+        alignSelf: 'center',
+        gap: 10,
     },
     list: {
         maxHeight: 200,
         width: '100%',
-        marginVertical: '1rem',
+        marginVertical: 12,
+    },
+    itemsContainer: {
+        gap: 6,
+        padding: 16,
     },
     preferenceButton: {
         // padding: 10,

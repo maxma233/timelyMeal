@@ -1,4 +1,4 @@
-import { View, StyleSheet, } from "react-native";
+import { View, StyleSheet, Pressable } from "react-native";
 import { useContext } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react-native";
 import { LocationContext } from "./QuestionnaireWindow";
@@ -17,15 +17,18 @@ function NavButton({ direction = "left"}) {
     return (
 
         <View style={styles.backButton}>
-            <button
-                onClick={() => {clickHandler()}}
-                >
+            <Pressable
+                accessibilityRole="button"
+                hitSlop={10}
+                style={styles.pressable}
+                onPress={clickHandler}
+            >
                 {isNegative ? (
-                    <ArrowLeft size={10} color="#000" />
+                    <ArrowLeft size={22} color="#000" />
                 ) : (
-                    <ArrowRight size={10} color="#000" />
+                    <ArrowRight size={22} color="#000" />
                 )}
-            </button>
+            </Pressable>
         </View>
 
     );
@@ -37,10 +40,18 @@ export default NavButton;
 const styles = StyleSheet.create({
     backButton: {
         backgroundColor: "transparent",
-        padding: 10,
+        padding: 6,
         borderRadius: 50,
-        width: 50,
-        height: 50,
+        width: 44,
+        height: 44,
         alignItems: 'center',
+        justifyContent: 'center',
     }
+    ,
+    pressable: {
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
 });
