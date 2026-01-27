@@ -1,7 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Image, Text } from "react-native";
-import AutoScroll from "@homielab/react-native-auto-scroll";
+import React, { useEffect, useRef, useState } from "react";
+import { Image, Platform, ScrollView, StyleSheet, View } from "react-native";
 import { Pressable } from "react-native";
+
+let AutoScroll = null;
+if (Platform.OS !== 'web') {
+    // AutoScroll is not reliably supported on web
+    AutoScroll = require('@homielab/react-native-auto-scroll').default;
+}
 
 const IMAGE_SOURCES = [require('./../assets/burger.png'),
 require('./../assets/friedChicken.png'),
@@ -25,6 +30,11 @@ const DEFAULT_DELAY = 8000;
 function ImageScroller() {
     const [shuffleToggle, setShuffleToggle] = useState(false);
 
+    const scrollRef = useRef(null);
+    const contentWidthRef = useRef(0);
+    const viewportWidthRef = useRef(0);
+    const scrollXRef = useRef(0);
+
 
     useEffect(() => {
         const reshuffle = () => {
@@ -34,14 +44,34 @@ function ImageScroller() {
             );
         }
 
-        setTimeout(() => setShuffleToggle(!shuffleToggle), DEFAULT_DELAY);
+        const timeoutId = setTimeout(() => setShuffleToggle(!shuffleToggle), DEFAULT_DELAY);
         reshuffle();
 
         if (IMAGE_NAMES[0] === IMAGE_NAMES_2[IMAGE_NAMES_2.length - 1] || IMAGE_NAMES_2[0] === IMAGE_NAMES[IMAGE_NAMES.length - 1])
             reshuffle();
 
 
+        return () => clearTimeout(timeoutId);
     }, [shuffleToggle])
+
+    useEffect(() => {
+        if (Platform.OS !== 'web') return;
+
+        const intervalMs = 16;
+        const stepPx = 1; // ~60px/sec
+
+        const id = setInterval(() => {
+            const maxX = Math.max(0, contentWidthRef.current - viewportWidthRef.current);
+            if (!scrollRef.current || maxX <= 0) return;
+
+            scrollXRef.current += stepPx;
+            if (scrollXRef.current > maxX) scrollXRef.current = 0;
+
+            scrollRef.current.scrollTo({ x: scrollXRef.current, animated: false });
+        }, intervalMs);
+
+        return () => clearInterval(id);
+    }, []);
 
 
 
@@ -90,21 +120,34 @@ function ImageScroller() {
         }
     }
 
+    const imageList = loadImageList();
+
     /* Component returns */
+    if (Platform.OS === 'web' || !AutoScroll) {
+        return (
+            <ScrollView
+                ref={scrollRef}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                onContentSizeChange={(w) => {
+                    contentWidthRef.current = w;
+                }}
+                onLayout={(e) => {
+                    viewportWidthRef.current = e?.nativeEvent?.layout?.width ?? 0;
+                }}
+                scrollEventThrottle={16}
+            >
+                {imageList}
+            </ScrollView>
+        );
+    }
+
     return (
         <View>
-            <AutoScroll
-                duration={DEFAULT_DELAY * 2}
-                delay={0}
-                endPaddingWidth={0}
-            >
-
-                {loadImageList()}
-
+            <AutoScroll duration={DEFAULT_DELAY * 2} delay={0} endPaddingWidth={0}>
+                {imageList}
             </AutoScroll>
-
-        </View >
-
+        </View>
     );
 }
 
