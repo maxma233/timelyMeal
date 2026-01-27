@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useContext, createContext, useCallback } from 'react';
 import { View, StyleSheet, TextInput, Button, Pressable, Animated, Text, VirtualizedList, Platform, useWindowDimensions } from 'react-native';
-import { ShoppingBasket03Icon, ListViewIcon, AddToListIcon } from 'hugeicons-react';
+// import { ShoppingBasket03Icon, ListViewIcon, AddToListIcon } from 'hugeicons-react';
 import { List } from '../assets/images.js';
 import ListTransition from '../components/ListTransition.js';
 import QuantityInput from './QuantityInput';
