@@ -11,7 +11,10 @@ function NavButton({ direction = "left"}) {
     const increment = isNegative ? -1 : 1;
 
     const clickHandler = (event) => {
-        setLocationVal(Math.min(Math.max(0, locationVal + increment), DEFAULT_QUESTIONNAIRE.length - 1));
+        // Allow navigating to the overview page (locationVal === DEFAULT_QUESTIONNAIRE.length)
+        // and back from it.
+        const maxLocation = DEFAULT_QUESTIONNAIRE.length;
+        setLocationVal(Math.min(Math.max(0, locationVal + increment), maxLocation));
     }
 
     return (
