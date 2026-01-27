@@ -5,6 +5,8 @@ import { Button } from 'react-native-elements';
 
 function OverviewPage({ setIsLoadingPlanRequest }) {
 
+    const [loadedQuestions, setLoadedQuestions] = useState(false);
+
     const { questionnaireData } = useContext(QuestionnaireContext);
     const { setLocationVal } = useContext(LocationContext);
 
@@ -30,6 +32,7 @@ function OverviewPage({ setIsLoadingPlanRequest }) {
         }
 
         surveyQuestions.current = [...listOfQuestions];
+        setLoadedQuestions(true);
 
     }, [])
 
