@@ -45,7 +45,7 @@ def output_as_one_line(list=None) -> str:
 def build_food_plan_prompt(user_input=None) -> str:
 
     food_type = user_input['foodType']
-    duration = user_input['duration']
+    # duration = user_input['duration']
     num_meals = user_input['numMeals']
     preferences = user_input['preferences']
 
