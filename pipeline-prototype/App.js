@@ -45,54 +45,72 @@ function Home() {
   const [isLoadingPlanRequest, setIsLoadingPlanRequest] = useState(null);
   const [loadingProgress, setLoadingProgress] = useState(0);
 
+  const [promptData, setPromptData] = useState(null);
+
   useEffect(() => {
     if (isLoadingPlanRequest) {
-      console.log('is showing the loading screen!')
+      console.log('is showing the loading screen!');
+      console.log('sending prompt to the model!');
+      handleSearch(promptData);
     }
   }, [isLoadingPlanRequest]);
+
+  useEffect(() => {
+    if (promptData !== null) {
+      console.log('new prompt data!', promptData)
+    }
+  }, [promptData]);
 
   const resetError = () => {
     setError('');
   }
 
-  const handleSearch = async () => {
+  const handleSearch = async (data) => {
     const currentTime = new Date();
+
+    console.log('searchign with data: ', data);
 
     resetError();
 
     // start loader
-    setIsLoadingPlanRequest(true);
+    // setIsLoadingPlanRequest(true);
     // setLoadingProgress(5);
 
-    if (text.length === 0 || !text.trim()) {
-      console.log("Empty search text");
-      setIsLoadingPlanRequest(false);
+    if (data == null) {
+      console.error('No form data passed into the search!')
       setLoadingProgress(0);
       return;
     }
 
+    // if (text.length === 0 || !text.trim()) {
+    //   console.log("Empty search text");
+    //   // setIsLoadingPlanRequest(false);
+    //   setLoadingProgress(0);
+    //   return;
+    // }
+
     try {
       // setLoadingProgress(20);
-
+      console.log('sending the request!');
       const response = await fetch(`http://${modelEndpoint}/prompt`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // body: JSON.stringify({ prompt: text.trim() }),
+        body: JSON.stringify({ prompt: data }),
       });
 
       console.log(response);
 
-      if (!response.ok) {
-        setError(`Error: Invalid prompt!`);
-        console.log('Invalid prompt!');
-        setIsLoadingPlanRequest(false);
-        setLoadingProgress(0);
-        return;
-      }
+      // if (!response.ok) {
+      //   setError(`Error: Invalid prompt!`);
+      //   console.log('Invalid prompt!');
+      //   // setIsLoadingPlanRequest(false);
+      //   setLoadingProgress(0);
+      //   return;
+      // }
 
-      const data = await response.json();
-      console.log('Valid prompt!');
-      console.log(`Request sent at: ${currentTime}`);
+      // const data = await response.json();
+      // console.log('Valid prompt!');
+      // console.log(`Request sent at: ${currentTime}`);
 
       // setLoadingProgress(45);
 
@@ -126,7 +144,8 @@ function Home() {
       // }, 250);
     } catch (err) {
       setError(`Error: ${err}`);
-      setIsLoadingPlanRequest(false);
+      console.error('an error occured!');
+      // setIsLoadingPlanRequest(false);
       setLoadingProgress(0);
     }
 
@@ -211,7 +230,7 @@ function Home() {
               {isLoadingPlanRequest ? 
                 <LoadingScreen progress={loadingProgress} />
                 :
-                <QuestionnaireWindow setIsLoadingPlanRequest={setIsLoadingPlanRequest} />
+                <QuestionnaireWindow setIsLoadingPlanRequest={setIsLoadingPlanRequest} savePromptData={setPromptData} />
               }
 
 

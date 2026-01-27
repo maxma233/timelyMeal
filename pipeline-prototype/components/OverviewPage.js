@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Pressable, ScrollView, useWindowDimensions } fr
 import { DEFAULT_QUESTIONNAIRE, QuestionnaireContext, LocationContext } from './QuestionnaireWindow.js';
 import { Button } from 'react-native-elements';
 
-function OverviewPage({ setIsLoadingPlanRequest }) {
+function OverviewPage({ save }) {
 
     const { questionnaireData } = useContext(QuestionnaireContext);
     const { setLocationVal } = useContext(LocationContext);
@@ -132,7 +132,7 @@ function OverviewPage({ setIsLoadingPlanRequest }) {
                     title = "Sent to Model"
                     onPress = {() => {
                         console.log("Sending data to model...", questionnaireData);
-                        setIsLoadingPlanRequest(true);
+                        save(questionnaireData);
                     }}
                 />
 
