@@ -37,6 +37,9 @@ export default function App() {
 
 function Home() {
 
+  // Loading in the model endpoint
+  const modelEndpoint = process.env.EXPO_PUBLIC_MODEL_HOST_ENDPOINT;
+
   const [text, setText] = useState('');
   const [error, setError] = useState('');
   const [isLoadingPlanRequest, setIsLoadingPlanRequest] = useState(null);
@@ -59,7 +62,7 @@ function Home() {
 
     // start loader
     setIsLoadingPlanRequest(true);
-    setLoadingProgress(5);
+    // setLoadingProgress(5);
 
     if (text.length === 0 || !text.trim()) {
       console.log("Empty search text");
@@ -69,7 +72,7 @@ function Home() {
     }
 
     try {
-      setLoadingProgress(20);
+      // setLoadingProgress(20);
 
       const response = await fetch('http://127.0.0.1:5000/prompt', {
         method: 'POST',
@@ -91,36 +94,36 @@ function Home() {
       console.log('Valid prompt!');
       console.log(`Request sent at: ${currentTime}`);
 
-      setLoadingProgress(45);
+      // setLoadingProgress(45);
 
       // model request
-      setLoadingProgress(60);
-      const modelResp = await fetch('http://127.0.0.1:5000/model', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: text.trim() }),
-      });
+      // setLoadingProgress(60);
+      // const modelResp = await fetch('http://127.0.0.1:5000/model', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ prompt: text.trim() }),
+      // });
 
-      setLoadingProgress(80);
+      // setLoadingProgress(80);
 
-      let output = undefined;
-      if (modelResp.ok) {
-        output = await modelResp.json();
-      } else {
-        setError(`Error: Model request failed (${modelResp.status})`);
-      }
+      // let output = undefined;
+      // if (modelResp.ok) {
+      //   output = await modelResp.json();
+      // } else {
+      //   setError(`Error: Model request failed (${modelResp.status})`);
+      // }
 
-      if (!output) {
-        setError('Error: Model output failed to instantiate!');
-      }
+      // if (!output) {
+      //   setError('Error: Model output failed to instantiate!');
+      // }
 
-      console.log(output);
+      // console.log(output);
 
-      setLoadingProgress(100);
-      setTimeout(() => {
-        setIsLoadingPlanRequest(false);
-        setLoadingProgress(0);
-      }, 250);
+      // setLoadingProgress(100);
+      // setTimeout(() => {
+      //   setIsLoadingPlanRequest(false);
+      //   setLoadingProgress(0);
+      // }, 250);
     } catch (err) {
       setError(`Error: ${err}`);
       setIsLoadingPlanRequest(false);
