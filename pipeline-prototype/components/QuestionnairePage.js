@@ -7,8 +7,11 @@ import LoadingScreen from './LoadingScreen';
 function QuestionnairePage() {
   const navigation = useNavigation();
 
+  const modelEndpoint = process.env.EXPO_PUBLIC_MODEL_HOST_ENDPOINT;
+
   const [isLoadingPlanRequest, setIsLoadingPlanRequest] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [promptData, setPromptData] = useState(null);
 
   useEffect(() => {
     if (!isLoadingPlanRequest) {
@@ -16,13 +19,38 @@ function QuestionnairePage() {
       return;
     }
 
-    setLoadingProgress(5);
-    const id = setInterval(() => {
-      setLoadingProgress((p) => (p >= 95 ? p : p + 5));
-    }, 350);
+    // setLoadingProgress(5);
+    // const id = setInterval(() => {
+    //   setLoadingProgress((p) => (p >= 95 ? p : p + 5));
+    // }, 350);
 
-    return () => clearInterval(id);
+    handleSearch(promptData);
+
+    // return () => clearInterval(id);
   }, [isLoadingPlanRequest]);
+
+  const handleSearch = async (data) => {
+    
+    if (data == null) {
+      console.error('No form data passed into the search!')
+      setLoadingProgress(0);
+      return;
+    }
+
+    try {
+
+      const response = await fetch(`http://${modelEndpoint}/prompt`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: data }),
+      });
+
+    } catch (err) {
+      console.error('An error occurred while sending the model a prompt');
+      setLoadingProgress(0);
+    }
+
+  }
 
   return (
     <SafeAreaView style={styles.body}>
@@ -42,7 +70,7 @@ function QuestionnairePage() {
         {isLoadingPlanRequest ? (
           <LoadingScreen progress={loadingProgress} />
         ) : (
-          <QuestionnaireWindow setIsLoadingPlanRequest={setIsLoadingPlanRequest} />
+        <QuestionnaireWindow setIsLoadingPlanRequest={setIsLoadingPlanRequest} savePromptData={setPromptData} />
         )}
       </ScrollView>
     </SafeAreaView>
