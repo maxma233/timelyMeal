@@ -1,5 +1,16 @@
-import React, { useEffect, useState, useRef, useContext} from "react";
-import { Button, Pressable, StyleSheet, Text, View, ScrollView } from "react-native";
+import React, { useEffect, useRef, useState, useContext } from "react";
+import {
+    Animated,
+    Button,
+    LayoutAnimation,
+    Platform,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    UIManager,
+    View,
+} from "react-native";
 import BouncyButton from "./BouncyButton";
 import { TextInput } from "react-native-paper";
 import { QuestionnaireContext } from "./QuestionnaireWindow";
@@ -14,6 +25,8 @@ function PreferenceList() {
     const {questionnaireData, setQuestionnaireData} = useContext(QuestionnaireContext);
     const [showAddWindow, setShowAddWindow] = useState(false);
 
+    const panelAnim = useRef(new Animated.Value(0)).current;
+
     const filteredDefault = DEFAULT_CUISINE_LIST.filter((item) => {
          return !questionnaireData.preferences.ethnicCuisines.includes(item) && !questionnaireData.preferences.ethnicCuisines.includes(DEFAULT_NO_PREFERENCE_WORD);
     } );
@@ -22,6 +35,12 @@ function PreferenceList() {
     useEffect(() => {
         console.log("Ethnic Cuisines: ",questionnaireData.preferences.ethnicCuisines);
     }, [questionnaireData.preferences.ethnicCuisines])
+
+    useEffect(() => {
+        if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+            UIManager.setLayoutAnimationEnabledExperimental(true);
+        }
+    }, []);
 
     // const [currentList, setCurrentList] = useState({ list: [...DEFAULT_CUISINE_LIST] });
     const [currentList, setCurrentList] = useState({ list: [...questionnaireData.preferences.ethnicCuisines, ...filteredDefault, ] });
@@ -68,16 +87,12 @@ function PreferenceList() {
     console.log(`Current List: ${currentList.list}`);
 
     useEffect(() => {
-
-        if (showAddWindow) {
-            // console.log("True!");
-            // console.log(parent);
-            popOutWindow();
-        } else {
-            // console.log("False!");
-        }
-
-    }, [showAddWindow]);
+        Animated.timing(panelAnim, {
+            toValue: showAddWindow ? 1 : 0,
+            duration: 180,
+            useNativeDriver: true,
+        }).start();
+    }, [panelAnim, showAddWindow]);
 
     const addItem = () => {
 
@@ -131,7 +146,10 @@ function PreferenceList() {
                     <Button
                         title="Close"
                         color={parentButtonContext.color}
-                        onPress={() => setShowAddWindow(false)}
+                        onPress={() => {
+                            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                            setShowAddWindow(false);
+                        }}
                     />
                     <Button
                         title="Add"
@@ -157,18 +175,40 @@ function PreferenceList() {
                 {loadList()}
 
             </ScrollView>
-            {!showAddWindow &&
-                <View style={{ alignSelf: 'center' }}>
+
+            <View style={styles.customArea}>
+                <View style={styles.customButtonRow}>
                     <Button
-                        title={"custom preference"}
-                        color={parentButtonContext.color}
+                        title={showAddWindow ? "Hide custom preferences" : "Custom preferences"}
+                        color={'purple'}
                         onPress={() => {
-                            setShowAddWindow(!showAddWindow)
+                            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                            setShowAddWindow((prev) => !prev);
                         }}
                     />
                 </View>
-            }
-            {showAddWindow && popOutWindow()}
+
+                <Animated.View
+                    pointerEvents={showAddWindow ? 'auto' : 'none'}
+                    style={[
+                        styles.customPanel,
+                        {
+                            maxHeight: showAddWindow ? 220 : 0,
+                            opacity: panelAnim,
+                            transform: [
+                                {
+                                    translateY: panelAnim.interpolate({
+                                        inputRange: [0, 1],
+                                        outputRange: [-8, 0],
+                                    }),
+                                },
+                            ],
+                        },
+                    ]}
+                >
+                    {popOutWindow()}
+                </Animated.View>
+            </View>
         </View>
     );
 
@@ -207,6 +247,21 @@ function PressableButton(PreferenceProps) {
 }
 
 const styles = StyleSheet.create({
+    customArea: {
+        width: '100%',
+        maxWidth: 420,
+        alignSelf: 'center',
+        paddingHorizontal: 16,
+        paddingBottom: 12,
+    },
+    customButtonRow: {
+        width: '100%',
+        alignSelf: 'center',
+    },
+    customPanel: {
+        overflow: 'hidden',
+        width: '100%',
+    },
     popOutWindow: {
         width: '100%',
         maxWidth: 420,
