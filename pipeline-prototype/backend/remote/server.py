@@ -32,8 +32,10 @@ current_dir = Path(__file__).resolve().parent.parent
 
 middleware_dir = current_dir.parent / 'middleware'
 culinaryBERT_dir = current_dir.parent / 'culinaryBERT'
-dish_ner_model = culinaryBERT_dir / 'models/dish_ner/culinaryBERT'
-restaurant_ner_model = culinaryBERT_dir / 'models/restaurant_ner/culinaryBERT'
+# dish_ner_model = culinaryBERT_dir / 'models/dish_ner/culinaryBERT'
+dish_ner_filepath = '../../../culinaryBERT/models/dish_ner/culinaryBERT'
+# restaurant_ner_model = culinaryBERT_dir / 'models/restaurant_ner/culinaryBERT'
+restaurant_ner_filepath ='../../../culinaryBERT/models/restaurant_ner/culinaryBERT'
 
 if middleware_dir.exists():
     sys.path.append(str(middleware_dir))
@@ -43,9 +45,9 @@ else:
 
 from parse_culinaryBERT import get_dishes
 
-culinaryBERT_tokenizer = BertTokenizerFast.from_pretrained('bert-based-cased') 
-culinaryBERT_dish_model = BertForTokenClassification.from_pretrained(dish_ner_model)
-culinaryBERT_restaurant_model = BertForTokenClassification.from_pretrained(restaurant_ner_model)
+culinaryBERT_tokenizer = BertTokenizerFast.from_pretrained('bert-base-cased') 
+culinaryBERT_dish_model = BertForTokenClassification.from_pretrained(dish_ner_filepath)
+culinaryBERT_restaurant_model = BertForTokenClassification.from_pretrained(restaurant_ner_filepath)
 
 culinaryBERT_dish_model.to(device)
 culinaryBERT_restaurant_model.to(device)
