@@ -3,6 +3,7 @@ from flask_cors import CORS
 
 import torch
 import os
+import asyncio
 import sys
 from huggingface_hub import login
 from transformers import (
@@ -113,6 +114,10 @@ def build_food_plan_prompt(user_input=None) -> str:
 
     return prompt_requirements
 
+async def run_ner_model(model:pipeline, text:str) -> list[dict]:
+    results = await model(text)
+    return results
+
 @app.route('/prompt', methods=['POST'])
 def prompt_model():
     """ 
@@ -158,6 +163,33 @@ def prompt_model():
     # print(model_response)
 
     return jsonify({"Message": model_response}), 200
+
+@app.route('/classify_dish', methods=['POST'])
+async def prompt_culinaryBERT():
+    """
+        Prompt culinaryBERT to classify what was presented in front of it.
+        Used for dish and restaurant (in progress) classification.
+    """
+
+    data = request.get_json()
+    
+    if (request.method != 'POST'):
+        return jsonify({'Error': 'Method request type not allowed'}),  405
+
+    text = data['text'] if 'text' in data else ''
+
+    if not text:
+        return jsonify({'Error': 'No value was sent to the model'}), 400
+    
+    # Run codependent on models (Dishes, Restaurants)
+    # Create the calls to await for
+    tasks = [run_ner_model(culinaryBERT_dish_pipe, text), run_ner_model(culinaryBERT_restaurant_pipe, text)]
+
+    results = await asyncio.gather(*tasks)
+
+    print(results)
+    
+    return jsonify({'Message': 'Not fully implemented yet'}), 200
 
 ## Run the backend from a portforwarded port
 if __name__ == "__main__":
