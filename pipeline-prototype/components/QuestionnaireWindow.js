@@ -18,6 +18,7 @@ export const BeadThemeContext = createContext();
 export const DEFAULT_QUESTIONNAIRE = [
     [
         { questions: ['Type of Food:'], component: <FoodTypeSelector />, checkFor: ["foodType"] }, 
+        
         { questions: ['Meals per day?'], component: <MealSelector />, checkFor: ["numMeals"] },
     ],
     [
@@ -36,11 +37,24 @@ const DEFAULT_QUESTIONNAIRE_DATA_STATE = {
         preferences: { ethnicCuisines: [], dishes: [], restaurants: [] },
     };
 
-function QuestionnaireWindow({ setIsLoadingPlanRequest }) {
+function QuestionnaireWindow({ setIsLoadingPlanRequest, savePromptData }) {
     
     const [locationVal, setLocationVal] = useState(0);
     const [questionnaireData, setQuestionnaireData] = useState(DEFAULT_QUESTIONNAIRE_DATA_STATE);
     const [indicatorBeads, setIndicatorBeads] = useState(new Array(DEFAULT_QUESTIONNAIRE.length).fill("#333"));
+
+    const finalizePromptData = (data) => {
+        savePromptData(data);
+        setIsLoadingPlanRequest(true);
+    }
+
+    // useEffect(() => {
+    //     // When the questionnaire window is no longer needed we will update the main var
+    //     return () => {
+    //         console.log('saving the prompt data!', questionnaireData);
+    //         savePromptData(questionnaireData);
+    //     };
+    // }, []);
 
     useEffect(() => {
         console.log("Questionnaire Data", questionnaireData)
@@ -76,7 +90,7 @@ function QuestionnaireWindow({ setIsLoadingPlanRequest }) {
                                     <QuestionBlock questions={DEFAULT_QUESTIONNAIRE[locationVal]} />
                                 </View>
                             ) : (
-                                <OverviewPage setIsLoadingPlanRequest={setIsLoadingPlanRequest} />
+                                <OverviewPage setIsLoadingPlanRequest={setIsLoadingPlanRequest} save={finalizePromptData}/>
                             )}
                         </View>
                     </BeadThemeContext.Provider>
