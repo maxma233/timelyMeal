@@ -1,0 +1,105 @@
+import { Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import QuestionnaireWindow from './QuestionnaireWindow';
+import LoadingScreen from './LoadingScreen';
+
+function QuestionnairePage() {
+  const navigation = useNavigation();
+
+  const [isLoadingPlanRequest, setIsLoadingPlanRequest] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+
+  useEffect(() => {
+    if (!isLoadingPlanRequest) {
+      setLoadingProgress(0);
+      return;
+    }
+
+    setLoadingProgress(5);
+    const id = setInterval(() => {
+      setLoadingProgress((p) => (p >= 95 ? p : p + 5));
+    }, 350);
+
+    return () => clearInterval(id);
+  }, [isLoadingPlanRequest]);
+
+  return (
+    <SafeAreaView style={styles.body}>
+      <View style={styles.navigation}>
+        <Pressable style={styles.brand} onPress={() => navigation.navigate('Landing')}>
+          <Image source={require('../assets/logoplaceholder.jpg')} style={styles.logo} />
+          <Text style={styles.paragraph}>TimelyMeals</Text>
+        </Pressable>
+
+        <View style={styles.navLinks}>
+          <Text style={styles.naviElement}>Link (Element)</Text>
+          <Text style={styles.naviElement}>Sign in with Google (Element)</Text>
+        </View>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.content}>
+        {isLoadingPlanRequest ? (
+          <LoadingScreen progress={loadingProgress} />
+        ) : (
+          <QuestionnaireWindow setIsLoadingPlanRequest={setIsLoadingPlanRequest} />
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+export default QuestionnairePage;
+
+const styles = StyleSheet.create({
+  navigation: {
+    color: '#ffffff',
+    backgroundColor: '#F44322',
+    padding: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  brand: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  logo: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+  },
+  navLinks: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  naviElement: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    backgroundColor: '#ffffff',
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: '#000000',
+  },
+  body: {
+    flex: 1,
+    backgroundColor: '#FEF1EE',
+    padding: 8,
+  },
+  paragraph: {
+    color: '#ffffff',
+    marginHorizontal: 12,
+    fontSize: 24,
+    alignSelf: 'center',
+    fontWeight: 'bold',
+  },
+  content: {
+    width: '100%',
+    alignSelf: 'center',
+    paddingVertical: 16,
+    maxWidth: 900,
+    gap: 16,
+  },
+});
