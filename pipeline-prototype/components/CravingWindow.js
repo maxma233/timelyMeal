@@ -16,6 +16,8 @@ function CravingWindow() {
 
     const parentThemeContext = useContext(ButtonContext);
 
+    const modelEndpoint = process.env.EXPO_PUBLIC_MODEL_HOST_ENDPOINT;
+
     const [shoppingCart, setShoppingCart] = useState(null);
     const [listSelect, setListSelect] = useState('dishes');
     const [toggleCart, setToggleCart] = useState(false);
@@ -168,10 +170,10 @@ function CravingWindow() {
 
         console.log(`Sending ${searchValue} to server!`);
         try {
-            const response = await fetch('http://127.0.0.1:5000/classify_dish',
+            const response = await fetch(`http://${modelEndpoint}/classify_dish`,
                 {
                     method: "POST",
-                    mode: "cors",
+                    // mode: "cors",
                     headers: {
                         "Content-Type": "application/json"
                     },
