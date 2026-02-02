@@ -116,8 +116,10 @@ def build_food_plan_prompt(user_input=None) -> str:
 
     return prompt_requirements
 
-async def run_ner_model(model:pipeline, text:str) -> list[dict]:
-    results = await model(text)
+def run_ner_model(model:pipeline, text:str) -> list[dict]:
+    # print('running model!')
+    results = model(text)
+    # print(f'results for {text}!')
     return results
 
 @app.route('/prompt', methods=['POST'])
@@ -185,13 +187,14 @@ async def prompt_culinaryBERT():
     
     # Run codependent on models (Dishes, Restaurants)
     # Create the calls to await for
-    tasks = [run_ner_model(culinaryBERT_dish_pipe, text), run_ner_model(culinaryBERT_restaurant_pipe, text)]
+    tasks = [(run_ner_model, [culinaryBERT_dish_pipe, text]), (run_ner_model, [culinaryBERT_restaurant_pipe, text])]
+    running_tasks = [asyncio.to_thread(task, *params) for (task, params) in tasks]
 
-    results = await asyncio.gather(*tasks)
+    results = await asyncio.gather(*running_tasks)
 
     print(results)
     
-    return jsonify({'Message': 'Not fully implemented yet'}), 200
+    return jsonify({'Message': ''}), 200
 
 ## Run the backend from a portforwarded port
 if __name__ == "__main__":
