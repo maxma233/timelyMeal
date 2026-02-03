@@ -60,7 +60,7 @@ print(f'Secret Token: {secret_token}')
 login(token=secret_token)
 
 print('loading the pipeline!')
-# pipe = pipeline("text-generation", model="timely/TimelyAI", device=device, torch_dtype=torch.bfloat16)
+pipe = pipeline("text-generation", model="timely/TimelyAI", device=device, torch_dtype=torch.bfloat16)
 
 culinaryBERT_dish_pipe: pipeline = pipeline('ner', model=culinaryBERT_dish_model, tokenizer=culinaryBERT_tokenizer, device=device)
 culinaryBERT_restaurant_pipe: pipeline = pipeline('ner', model=culinaryBERT_restaurant_model, tokenizer=culinaryBERT_tokenizer, device=device)
