@@ -201,7 +201,7 @@ async def prompt_culinaryBERT():
 
     print(dish, most_confident_entity)
     
-    return jsonify({'Message': ''}), 200
+    return jsonify({'Message': dish, "Type": most_confident_entity}), 200
 
 ## Run the backend from a portforwarded port
 if __name__ == "__main__":
