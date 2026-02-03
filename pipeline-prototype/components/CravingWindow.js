@@ -32,7 +32,9 @@ function CravingWindow() {
 
     const [listHeight, setListHeight] = useState(0);
     // const ref = useRef(null);
+
     const searchRef = useRef(null);
+    // const searchTextBox = useRef(null);
 
     const DISH_LIST_COLOR = '#A12';
     const RESTAURANT_LIST_COLOR = '#882';
@@ -136,7 +138,9 @@ function CravingWindow() {
             // console.log("Current cart: ", questionnaireData.preferences);
 
             if (searchRef.current.text) {
-                searchRef.current.text = '';
+                // console.log('reset search ref text value!');
+                searchRef.current.clear();
+
             }
 
             cartTagIsRestaurant ? setNewRestaurant(resetValues) : setNewDish(resetValues);
