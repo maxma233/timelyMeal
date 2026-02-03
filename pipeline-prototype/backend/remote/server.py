@@ -3,8 +3,15 @@ from flask_cors import CORS
 
 import torch
 import os
+import asyncio
+import sys
 from huggingface_hub import login
-from transformers import pipeline
+from transformers import (
+    pipeline,
+    BertForTokenClassification,
+    BertTokenizerFast
+)
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -20,6 +27,31 @@ device = "cuda:0" if torch.cuda.is_available() else "cpu"
 model_name = "timely/TimelyAI"
 secret_token = os.getenv("SECRET_KEY")
 
+# Get paths for the ner models
+current_dir = Path(__file__).resolve().parent.parent
+
+middleware_dir = current_dir.parent / 'middleware'
+culinaryBERT_dir = current_dir.parent / 'culinaryBERT'
+# dish_ner_model = culinaryBERT_dir / 'models/dish_ner/culinaryBERT'
+dish_ner_filepath = '../../../culinaryBERT/models/dish_ner/culinaryBERT'
+# restaurant_ner_model = culinaryBERT_dir / 'models/restaurant_ner/culinaryBERT'
+restaurant_ner_filepath ='../../../culinaryBERT/models/restaurant_ner/culinaryBERT'
+
+if middleware_dir.exists():
+    sys.path.append(str(middleware_dir))
+else:
+    print(f'Middleware path ({middleware_dir}) does not exist!')
+    exit()
+
+from parse_culinaryBERT import get_dishes, determine_most_confident, Prediction
+
+culinaryBERT_tokenizer = BertTokenizerFast.from_pretrained('bert-base-cased') 
+culinaryBERT_dish_model = BertForTokenClassification.from_pretrained(dish_ner_filepath)
+culinaryBERT_restaurant_model = BertForTokenClassification.from_pretrained(restaurant_ner_filepath)
+
+culinaryBERT_dish_model.to(device)
+culinaryBERT_restaurant_model.to(device)
+
 # print(os.environ)
 
 print(f'Secret Token: {secret_token}')
@@ -29,7 +61,9 @@ login(token=secret_token)
 
 print('loading the pipeline!')
 pipe = pipeline("text-generation", model="timely/TimelyAI", device=device, torch_dtype=torch.bfloat16)
-print('pipeline ready!')
+
+culinaryBERT_dish_pipe: pipeline = pipeline('ner', model=culinaryBERT_dish_model, tokenizer=culinaryBERT_tokenizer, device=device)
+culinaryBERT_restaurant_pipe: pipeline = pipeline('ner', model=culinaryBERT_restaurant_model, tokenizer=culinaryBERT_tokenizer, device=device)
 
 def output_as_one_line(list=None) -> str:
     
@@ -82,6 +116,12 @@ def build_food_plan_prompt(user_input=None) -> str:
 
     return prompt_requirements
 
+def run_ner_model(model:pipeline, text:str) -> list[dict]:
+    # print('running model!')
+    results = model(text)
+    # print(f'results for {text}!')
+    return results
+
 @app.route('/prompt', methods=['POST'])
 def prompt_model():
     """ 
@@ -127,6 +167,41 @@ def prompt_model():
     # print(model_response)
 
     return jsonify({"Message": model_response}), 200
+
+@app.route('/classify_dish', methods=['POST'])
+async def prompt_culinaryBERT():
+    """
+        Prompt culinaryBERT to classify what was presented in front of it.
+        Used for dish and restaurant (in progress) classification.
+    """
+
+    data = request.get_json()
+    
+    if (request.method != 'POST'):
+        return jsonify({'Error': 'Method request type not allowed'}),  405
+
+    text = data['text'] if 'text' in data else ''
+
+    if not text:
+        return jsonify({'Error': 'No value was sent to the model'}), 400
+    
+    # Run codependent on models (Dishes, Restaurants)
+    # Create the calls to await for
+    tasks = [(run_ner_model, [culinaryBERT_dish_pipe, text]), (run_ner_model, [culinaryBERT_restaurant_pipe, text])]
+    running_tasks = [asyncio.to_thread(task, *params) for (task, params) in tasks]
+
+    results: Prediction = await asyncio.gather(*running_tasks)
+    filtered_results = [x for x in results if len(x) > 0]
+    print(results)
+
+    most_confident_entity = determine_most_confident(filtered_results)
+    dish = [get_dishes(x) for x in filtered_results if Prediction(**x[0]).entity[2:] in most_confident_entity]
+    # dish_results = map(get_dishes, results)
+    # print(list(dish_results))
+
+    print(dish, most_confident_entity)
+    
+    return jsonify({'Message': dish, "Type": most_confident_entity}), 200
 
 ## Run the backend from a portforwarded port
 if __name__ == "__main__":

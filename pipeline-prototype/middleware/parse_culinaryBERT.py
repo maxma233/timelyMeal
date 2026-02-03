@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+import statistics
+
 class PredictionException(Exception):
     """
         This exception is for the instance when culinaryBERT
@@ -9,6 +12,46 @@ class PredictionException(Exception):
     def __init__(self, message='model has returned an invalid response'):
         self.message = message
         super().__init__(self.message)
+
+@dataclass
+class Prediction:
+    entity: str
+    score: float
+    index: int
+    word: str
+    start: int 
+    end: int
+
+def determine_most_confident(predictions:list[list[dict]]) -> str:
+    """
+    Used to determine the most confident entity type from the provided predictions
+    
+    :param predictions: Takes in a list of predictions, Ex: (Dish & Restaurant)
+    :type predictions: list[dict]
+    :return: Will return an entity label that reflects the highest confident score
+    :rtype: str
+    """
+
+    entity_types = [[Prediction(**prediction[0]).entity[2:], None] for prediction in predictions]
+
+    for index, prediction in enumerate(predictions):
+        converted_predictions: list[Prediction] = [Prediction(**x) for x in prediction]
+        score = statistics.mean([x.score for x in converted_predictions])
+        entity_types[index][1] = score
+
+    max_prob = 0
+    prev_prob = 0
+    most_confident = None
+
+    for types in entity_types:
+        prev_prob = max_prob
+        max_prob = max(max_prob, types[1])
+        if prev_prob < max_prob:
+            most_confident = types[0]
+
+    print(f'Most confident with: {most_confident}')
+    return most_confident
+
 
 def get_dishes(predictions) -> list:
     """
@@ -22,7 +65,7 @@ def get_dishes(predictions) -> list:
     prev_label = None
     label = None
 
-    entity_label = ''
+    # entity_label = ''
 
     # Dictionary containing the rules for how new words (not subwords)
     # can be attached to previous words
@@ -32,7 +75,7 @@ def get_dishes(predictions) -> list:
         # Tracks the previous label
         if label:
             prev_label = label
-            entity_label = pred['entity'][2:] if entity_label == '' else entity_label
+            # entity_label = pred['entity'][2:] if entity_label == '' else entity_label
 
         label = pred["entity"][:1]
         current_rule = label_rule_book[label] 
@@ -82,5 +125,5 @@ def get_dishes(predictions) -> list:
     # Final buffer push 
     entities.append(buffer)
 
-    return entities, entity_label
+    return entities
 
