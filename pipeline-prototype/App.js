@@ -5,20 +5,6 @@ import HomePage from './components/HomePage';
 import QuestionnairePage from './components/QuestionnairePage';
 
 export const ButtonContext = createContext();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const Stack = createNativeStackNavigator();
 
 export default function App() {
