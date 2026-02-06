@@ -1,8 +1,10 @@
 import { Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useEffect, useState } from 'react';
+import { createRef, useContext, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { loadingStyles } from '../lib/styles/progess_loader_styles';
 import QuestionnaireWindow from './QuestionnaireWindow';
-import LoadingScreen from './LoadingScreen';
+import { PlanGenerationContext } from './Context/PlanGenerationContext';
+import { PlanConfirmationView } from './PlanConfirmationView';
 
 function QuestionnairePage() {
   const navigation = useNavigation();
@@ -10,32 +12,41 @@ function QuestionnairePage() {
   const modelEndpoint = process.env.EXPO_PUBLIC_MODEL_HOST_ENDPOINT;
 
   const [isLoadingPlanRequest, setIsLoadingPlanRequest] = useState(false);
-  const [loadingProgress, setLoadingProgress] = useState(0);
   const [promptData, setPromptData] = useState(null);
+  const promptResult = createRef(null);
+
+  const { setIsGenerating, setShowFloatingToast } = useContext(PlanGenerationContext);
 
   useEffect(() => {
     if (!isLoadingPlanRequest) {
-      setLoadingProgress(0);
       return;
     }
-
-    // setLoadingProgress(5);
-    // const id = setInterval(() => {
-    //   setLoadingProgress((p) => (p >= 95 ? p : p + 5));
-    // }, 350);
 
     handleSearch(promptData);
 
     // return () => clearInterval(id);
-  }, [isLoadingPlanRequest]);
+  }, [isLoadingPlanRequest, promptData]);
+
+  useEffect(() => {
+    if (!promptResult.current) return;
+    console.log('received prompt results');
+    console.log(promptResult.current);
+
+    // FIXME: Proceed to plan at this point
+    // navigation.navigate('Landing');
+  }, [promptResult])
 
   const handleSearch = async (data) => {
-    
+
     if (data == null) {
       console.error('No form data passed into the search!')
-      setLoadingProgress(0);
+      setIsGenerating(false);
+      setShowFloatingToast(false);
+      setIsLoadingPlanRequest(false);
       return;
     }
+
+    setIsGenerating(true);
 
     try {
 
@@ -45,12 +56,27 @@ function QuestionnairePage() {
         body: JSON.stringify({ prompt: data }),
       });
 
+      if (!response.ok) {
+        throw new Error('Model request failed');
+      }
+
+      promptResult.current = await response.text() || null;
+
     } catch (err) {
       console.error('An error occurred while sending the model a prompt');
-      setLoadingProgress(0);
+      if (!prompt.current) console.error('No response was found');
     }
 
+    setIsGenerating(false);
+    setShowFloatingToast(false);
+    setIsLoadingPlanRequest(false);
+
   }
+
+  const handleExploreMore = () => {
+    setShowFloatingToast(true);
+    navigation.navigate('Landing');
+  };
 
   return (
     <SafeAreaView style={styles.body}>
@@ -68,9 +94,9 @@ function QuestionnairePage() {
 
       <ScrollView contentContainerStyle={styles.content}>
         {isLoadingPlanRequest ? (
-          <LoadingScreen progress={loadingProgress} />
+          <PlanConfirmationView onExploreMore={handleExploreMore} />
         ) : (
-        <QuestionnaireWindow setIsLoadingPlanRequest={setIsLoadingPlanRequest} savePromptData={setPromptData} />
+          <QuestionnaireWindow setIsLoadingPlanRequest={setIsLoadingPlanRequest} savePromptData={setPromptData} />
         )}
       </ScrollView>
     </SafeAreaView>
@@ -79,7 +105,8 @@ function QuestionnairePage() {
 
 export default QuestionnairePage;
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
+  ...loadingStyles, // Additional styles for loading component
   navigation: {
     color: '#ffffff',
     backgroundColor: '#F44322',
