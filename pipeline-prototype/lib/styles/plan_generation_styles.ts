@@ -15,7 +15,7 @@ export const planGeneratorStyles = StyleSheet.create({
   toast: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.94)',
+    backgroundColor: '#F44322',
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 14,
@@ -51,11 +51,29 @@ export const planGeneratorStyles = StyleSheet.create({
   },
   steam: {
     position: 'absolute',
-    width: 22,
-    height: 42,
     borderRadius: 14,
+    zIndex: 99,
+  },
+  steam1: {
+    width: 22,
+    height: 22,
     backgroundColor: 'rgba(255,255,255,0.9)',
-    top: -22,
+    top: -20,
+    left: 0,
+  },
+  steam2: {
+    width: 18,
+    height: 18,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    top: -5,
+    left: 10,
+  },
+  steam3: {
+    width: 13,
+    height: 13,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    top: 0,
+    left: 20,
   },
   textGroup: {
     flexShrink: 1,
@@ -64,11 +82,11 @@ export const planGeneratorStyles = StyleSheet.create({
   toastTitle: {
     fontWeight: '700',
     fontSize: 16,
-    color: '#221510',
+    color: '#ffffff',
   },
   toastSubtitle: {
     marginTop: 2,
     fontSize: 13,
-    color: '#4b3b35',
+    color: '#ffffff',
   },
 });
