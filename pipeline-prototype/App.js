@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomePage from './components/HomePage';
 import QuestionnairePage from './components/QuestionnairePage';
-import { PlanGenerationProvider } from './components/PlanGenerationContext';
+import { PlanGenerationProvider } from './components/Providers/PlanGenerationProvider';
 
 export const ButtonContext = createContext();
 const Stack = createNativeStackNavigator();
