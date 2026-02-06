@@ -1,9 +1,10 @@
 import { Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useContext, useEffect, useState } from 'react';
+import { createRef, useContext, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { loadingStyles } from '../lib/styles/progess_loader_styles';
 import QuestionnaireWindow from './QuestionnaireWindow';
 import { PlanGenerationContext } from './Context/PlanGenerationContext';
+import { PlanConfirmationView } from './PlanConfirmationView';
 
 function QuestionnairePage() {
   const navigation = useNavigation();
@@ -12,6 +13,7 @@ function QuestionnairePage() {
 
   const [isLoadingPlanRequest, setIsLoadingPlanRequest] = useState(false);
   const [promptData, setPromptData] = useState(null);
+  const promptResult = createRef(null);
 
   const { setIsGenerating, setShowFloatingToast } = useContext(PlanGenerationContext);
 
@@ -25,6 +27,15 @@ function QuestionnairePage() {
     // return () => clearInterval(id);
   }, [isLoadingPlanRequest, promptData]);
 
+  useEffect(() => {
+    if (!promptResult.current) return;
+    console.log('received prompt results');
+    console.log(promptResult.current);
+
+    // FIXME: Proceed to plan at this point
+    // navigation.navigate('Landing');
+  }, [promptResult])
+
   const handleSearch = async (data) => {
 
     if (data == null) {
@@ -34,6 +45,8 @@ function QuestionnairePage() {
       setIsLoadingPlanRequest(false);
       return;
     }
+
+    setIsGenerating(true);
 
     try {
 
@@ -46,9 +59,12 @@ function QuestionnairePage() {
       if (!response.ok) {
         throw new Error('Model request failed');
       }
-      await response.text();
+
+      promptResult.current = await response.text() || null;
+
     } catch (err) {
       console.error('An error occurred while sending the model a prompt');
+      if (!prompt.current) console.error('No response was found');
     }
 
     setIsGenerating(false);
@@ -87,37 +103,9 @@ function QuestionnairePage() {
   );
 }
 
-function PlanConfirmationView({ onExploreMore }) {
-  return (
-    <View style={styles.confirmationContainer}>
-      <View style={styles.confirmationCard}>
-        <View style={styles.confirmationIcon}>
-          <View style={styles.plate}>
-            <View style={styles.plateHighlight} />
-          </View>
-          <View style={styles.spoon} />
-        </View>
-        <Text style={styles.confirmationTitle}>Your plan is being generated</Text>
-        <Text style={styles.confirmationCopy}>
-          We’re blending your preferences into an inspired food plan. Feel free to explore the rest of TimelyMeals while it simmers.
-        </Text>
-        <Pressable
-          style={({ pressed }) => [
-            styles.exploreButton,
-            pressed && styles.exploreButtonPressed,
-          ]}
-          onPress={onExploreMore}
-        >
-          <Text style={styles.exploreLabel}>Explore more</Text>
-        </Pressable>
-      </View>
-    </View>
-  );
-}
-
 export default QuestionnairePage;
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   ...loadingStyles, // Additional styles for loading component
   navigation: {
     color: '#ffffff',
