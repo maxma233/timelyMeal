@@ -1,9 +1,9 @@
 import { Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useContext, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { loadingStyles } from '../lib/styles/loading_styles';
+import { loadingStyles } from '../lib/styles/progess_loader_styles';
 import QuestionnaireWindow from './QuestionnaireWindow';
-import { PlanGenerationContext } from './PlanGenerationContext';
+import { PlanGenerationContext } from './Context/PlanGenerationContext';
 
 function QuestionnairePage() {
   const navigation = useNavigation();
