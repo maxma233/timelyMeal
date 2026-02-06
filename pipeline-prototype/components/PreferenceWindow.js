@@ -16,8 +16,10 @@ function PreferenceWindow() {
     return (
 
         <View style={styles.container}>
-            <PreferenceList />
-            <View style={{}}>
+            <View style={styles.preferenceListContainer}>
+                <PreferenceList compact />
+            </View>
+            <View style={styles.nextButtonContainer}>
                 <Button
                     onPress={clickHandler}
                     title={"next"}
@@ -41,6 +43,16 @@ const styles = StyleSheet.create({
         width: '100%',
         // height: '100%',
 
+    },
+    preferenceListContainer: {
+        position: 'relative',
+        zIndex: 1,
+    },
+    nextButtonContainer: {
+        marginTop: 32,
+        paddingBottom: 12,
+        position: 'relative',
+        zIndex: 0,
     },
     // buttonContainer: {
     //     zIndex: 10,

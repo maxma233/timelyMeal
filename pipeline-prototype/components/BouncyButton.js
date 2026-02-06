@@ -1,76 +1,64 @@
 import React from "react";
 import {
-    Alert,
-    SafeAreaView,
     StyleSheet,
     Text,
-    TouchableOpacity,
     View,
 } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import RNBounceable from "@freakycoder/react-native-bounceable";
 
-function BouncyButton({ title, onButtonClick, isPreFilled }) {
-    // let bouncyCheckboxRef = BouncyCheckbox;
+function BouncyButton({ title, onButtonClick, isPreFilled, checked, compact = false }) {
     const [checkboxState, setCheckboxState] = React.useState(isPreFilled ? true : false);
-    const value = title;
-
-    const clickHandler = (isChecked) => {
-
-        onButtonClick("Bouncy Button clicked");
-
-        console.log(`Checked ${value}:: ${isChecked}`)
-        // Alert.alert(`Checked:: ${isChecked}`);
-    }
+    const isCheckedValue = typeof checked === 'boolean' ? checked : checkboxState;
 
 
     return (
-        <SafeAreaView
-            style={{
-                flex: 1,
-                alignItems: "center",
-                justifyContent: "center",
-            }}
-        >
-            {/* <View style={{ ...styles.checkboxesContainer, ...{ display: "flex" } }}> */}
-            <View style={styles.checkboxesContainer}>
+        <View style={styles.container}>
+            <View style={[styles.checkboxesContainer, compact && styles.checkboxesContainerCompact]}>
                 <View style={styles.titleCheckboxRow}>
-                    <Text style={styles.titleText}>{title}</Text>
+                    <Text style={[styles.titleText, compact && styles.titleTextCompact]} numberOfLines={1}>
+                        {title}
+                    </Text>
                     <BouncyCheckbox
-                        // ref={bouncyCheckboxRef}
                         disableText
                         fillColor="#9342f5"
-                        size={20}
-                        iconImageStyle={styles.iconImageStyle}
+                        size={compact ? 18 : 20}
                         iconStyle={{ borderColor: '#9342f5' }}
-                        isChecked={checkboxState}
-                        onPress={isChecked => {
-                            clickHandler(isChecked);
+                        isChecked={isCheckedValue}
+                        onPress={(nextChecked) => {
+                            setCheckboxState(nextChecked);
+                            onButtonClick?.(nextChecked);
                         }}
-
                     />
                 </View>
-
             </View>
-        </SafeAreaView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
+    container: {
+        width: '100%',
+    },
     checkboxesContainer: {
         padding: 16,
         width: '100%',
+    },
+    checkboxesContainerCompact: {
+        paddingVertical: 10,
+        paddingHorizontal: 12,
     },
     titleCheckboxRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 10,
     },
     titleText: {
         fontSize: 16,
         fontWeight: '500',
         flex: 1,
+    },
+    titleTextCompact: {
+        fontSize: 14,
     },
     checkboxSyntheticContainer: {
         alignItems: 'center',
