@@ -1,19 +1,21 @@
 import React, { createContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Text, View } from 'react-native';
-import { planGeneratorStyles } from '../lib/styles/plan_generation';
+import { planGeneratorStyles } from '../../lib/styles/plan_generation_styles';
+import { PlanGenerationProps } from '../../lib/types/plan_generation_types'
 
 export const PlanGenerationContext = createContext({
   isGenerating: false,
   setIsGenerating: () => { },
   showFloatingToast: false,
   setShowFloatingToast: () => { },
-});
+} as PlanGenerationProps);
 
-function GeneratingPlanToast({ isVisible }) {
+export function GeneratingPlanToast({ isVisible }) {
   const steamAnim = useRef(new Animated.Value(0)).current;
   const bowlAnim = useRef(new Animated.Value(0)).current;
   const floatAnim = useRef(new Animated.Value(0)).current;
 
+  // note from dev: AI gen animation, review
   useEffect(() => {
     if (!isVisible) {
       steamAnim.stopAnimation();
@@ -143,26 +145,3 @@ function GeneratingPlanToast({ isVisible }) {
     </View>
   );
 }
-
-export function PlanGenerationProvider({ children }) {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [showFloatingToast, setShowFloatingToast] = useState(false);
-
-  const value = useMemo(
-    () => ({
-      isGenerating,
-      setIsGenerating,
-      showFloatingToast,
-      setShowFloatingToast,
-    }),
-    [isGenerating, showFloatingToast],
-  );
-
-  return (
-    <PlanGenerationContext.Provider value={value}>
-      <View style={planGeneratorStyles.childContainer}>{children}</View>
-      <GeneratingPlanToast isVisible={isGenerating && showFloatingToast} />
-    </PlanGenerationContext.Provider>
-  );
-}
-
