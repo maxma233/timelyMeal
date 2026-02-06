@@ -10,6 +10,7 @@ export const PlanGenerationContext = createContext({
   setShowFloatingToast: () => { },
 } as PlanGenerationProps);
 
+
 export function GeneratingPlanToast({ isVisible }) {
   const steamAnim = useRef(new Animated.Value(0)).current;
   const bowlAnim = useRef(new Animated.Value(0)).current;
@@ -124,15 +125,19 @@ export function GeneratingPlanToast({ isVisible }) {
         ]}
       >
         <View style={planGeneratorStyles.foodIllustration}>
-          <Animated.View
-            style={[
-              planGeneratorStyles.steam,
-              {
-                opacity: steamOpacity,
-                transform: [{ translateY: steamTranslateY }],
-              },
-            ]}
-          />
+          {[0, 1, 2].map((num) => {
+            return (
+              <Animated.View
+                style={[
+                  { ...planGeneratorStyles.steam, ...planGeneratorStyles[`steam${num}`] },
+                  {
+                    opacity: steamOpacity,
+                    transform: [{ translateY: steamTranslateY }],
+                  },
+                ]}
+              />
+            );
+          })}
           <Animated.View style={[planGeneratorStyles.bowl, { transform: [{ scale: bowlScale }] }]}>
             <View style={planGeneratorStyles.liquid} />
           </Animated.View>
