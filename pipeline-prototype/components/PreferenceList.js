@@ -51,15 +51,7 @@ function PreferenceList({ compact = false } = {}) {
     const [itemName, setItemName] = useState('');
     const [selectedItems, setSelectedItems] = useState([...questionnaireData.preferences.ethnicCuisines]);
 
-    useEffect(() => {
-        if (!selectedItems.includes(DEFAULT_NO_PREFERENCE_WORD)) {
-            currentListSaveState.current = {
-                list: currentList.list,
-                selected: selectedItems,
-            };
-        }
-    }, [currentList.list, selectedItems]);
-
+    
     const handleSelection = (item, isSelected) => {
         let updatedSelection;
         const noneFlag = item === DEFAULT_NO_PREFERENCE_WORD;
