@@ -1,7 +1,17 @@
 pipeline-prototype/package-lock.json
 .env
-culinaryBERT/models
 culinaryBERT/data
 culinaryBERT/food_extractor/__pycache__
 *.txt
 *.pyc
+
+# Allow the ner models to be committed
+culinaryBERT/models/*
+
+!culinaryBERT/models/dish_ner
+culinaryBERT/models/dish_ner/*
+!culinaryBERT/models/dish_ner/culinaryBERT
+
+!culinaryBERT/models/restaurant_ner
+culinaryBERT/models/restaurant_ner/*
+!culinaryBERT/models/restaurant_ner/culinaryBERT
