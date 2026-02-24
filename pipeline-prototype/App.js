@@ -1,5 +1,5 @@
 import React, { createContext, useEffect } from 'react';
-import { Text } from 'react-native';
+import { Platform, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomePage from './components/HomePage';
@@ -20,10 +20,11 @@ export default function App() {
     if (!fontsLoaded) {
       return;
     }
+    const defaultFontFamily = Platform.OS === 'web' ? 'Inter' : 'Inter_700Bold';
     const defaultTextProps = Text.defaultProps || {};
     Text.defaultProps = {
       ...defaultTextProps,
-      style: [{ fontFamily: 'Inter_400Regular' }, defaultTextProps.style],
+      style: [{ fontFamily: defaultFontFamily, fontWeight: '700' }, defaultTextProps.style],
     };
   }, [fontsLoaded]);
 
