@@ -9,11 +9,9 @@ html,
 body,
 #root {
 	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-	font-weight: 700;
 }
 
 #root,
 #root * {
 	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-	font-weight: 700 !important;
 }
