@@ -20,11 +20,11 @@ export default function App() {
     if (!fontsLoaded) {
       return;
     }
-    const defaultFontFamily = Platform.OS === 'web' ? 'Inter' : 'Inter_700Bold';
+    const defaultFontFamily = Platform.OS === 'web' ? 'Inter' : 'Inter_400Regular';
     const defaultTextProps = Text.defaultProps || {};
     Text.defaultProps = {
       ...defaultTextProps,
-      style: [{ fontFamily: defaultFontFamily, fontWeight: '700' }, defaultTextProps.style],
+      style: [{ fontFamily: defaultFontFamily }, defaultTextProps.style],
     };
   }, [fontsLoaded]);
 
