@@ -130,6 +130,7 @@ def prompt_model():
     """
 
     data = request.get_json()
+    output = None
 
     base_messages = [
         {
@@ -160,7 +161,8 @@ def prompt_model():
     # print(base_messages)
 
     # Call the model
-    output = pipe(text_inputs=base_messages, max_new_tokens=500)
+    with torch.compiler.set_stance('force_eager'):
+        output = pipe(text_inputs=base_messages, max_new_tokens=500)
     
     model_response = output[0]["generated_text"][-1]["content"]
 
