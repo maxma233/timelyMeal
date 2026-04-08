@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import QuestionnaireWindow from './QuestionnaireWindow';
 import LoadingScreen from './LoadingScreen';
+import MealPlanView from './MealPlanView';
 
 function QuestionnairePage() {
   const navigation = useNavigation();
@@ -12,28 +13,31 @@ function QuestionnairePage() {
   const [isLoadingPlanRequest, setIsLoadingPlanRequest] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [promptData, setPromptData] = useState(null);
+  const [mealPlanText, setMealPlanText] = useState('');
+  const [modelError, setModelError] = useState('');
 
   useEffect(() => {
-    if (!isLoadingPlanRequest) {
+    if (!isLoadingPlanRequest || !promptData) {
       setLoadingProgress(0);
       return;
     }
 
-    // setLoadingProgress(5);
-    // const id = setInterval(() => {
-    //   setLoadingProgress((p) => (p >= 95 ? p : p + 5));
-    // }, 350);
+    setLoadingProgress(10);
+    const id = setInterval(() => {
+      setLoadingProgress((p) => (p >= 90 ? p : p + 10));
+    }, 300);
 
     handleSearch(promptData);
 
-    // return () => clearInterval(id);
-  }, [isLoadingPlanRequest]);
+    return () => clearInterval(id);
+  }, [isLoadingPlanRequest, promptData]);
 
   const handleSearch = async (data) => {
     
     if (data == null) {
       console.error('No form data passed into the search!')
       setLoadingProgress(0);
+      setIsLoadingPlanRequest(false);
       return;
     }
 
@@ -45,12 +49,41 @@ function QuestionnairePage() {
         body: JSON.stringify({ prompt: data }),
       });
 
+      const result = await response.json();
+
+      if (!response.ok) {
+        const errorMessage = result?.Error || 'Unable to generate meal plan right now.';
+        setModelError(errorMessage);
+        return;
+      }
+
+      const message = result?.Message;
+
+      if (!message || typeof message !== 'string') {
+        setModelError('The model returned an empty meal plan.');
+        return;
+      }
+
+      setMealPlanText(message);
+      setModelError('');
+      setLoadingProgress(100);
+
     } catch (err) {
       console.error('An error occurred while sending the model a prompt');
+      setModelError('Could not connect to the model service. Please try again.');
       setLoadingProgress(0);
+    } finally {
+      setIsLoadingPlanRequest(false);
     }
 
   }
+
+  const handleBackToQuestionnaire = () => {
+    setMealPlanText('');
+    setModelError('');
+    setLoadingProgress(0);
+    setPromptData(null);
+  };
 
   return (
     <SafeAreaView style={styles.body}>
@@ -69,6 +102,10 @@ function QuestionnairePage() {
       <ScrollView contentContainerStyle={styles.content}>
         {isLoadingPlanRequest ? (
           <LoadingScreen progress={loadingProgress} />
+        ) : mealPlanText ? (
+          <MealPlanView mealPlanText={mealPlanText} onBuildAnother={handleBackToQuestionnaire} />
+        ) : modelError ? (
+          <MealPlanView error={modelError} onBuildAnother={handleBackToQuestionnaire} />
         ) : (
         <QuestionnaireWindow setIsLoadingPlanRequest={setIsLoadingPlanRequest} savePromptData={setPromptData} />
         )}

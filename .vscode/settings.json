@@ -1,5 +1,6 @@
 {
     "cSpell.words": [
         "Pressable"
-    ]
+    ],
+    "python.terminal.useEnvFile": true
 }
